@@ -69,6 +69,7 @@ export const services: Service[] = [
     summary: "Instalação de suporte fixo, com a TV rente à parede.",
     description: "Instalação de suporte fixo. Informe o modelo da TV para avaliarmos a instalação.",
     infoNeeded: supportInfo, durationMinutes: null, priceMode: "sob_orcamento", active: true, order: 5,
+    heroImage: "/images/banners/servico-suporte-fixo-bg.webp",
   },
   {
     id: "suporte-articulado", slug: "instalacao-de-suporte-articulado", categoryId: "instalacao-suporte",
