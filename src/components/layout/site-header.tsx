@@ -10,41 +10,26 @@ const linkClass =
 
 /**
  * Menu flutuante em pílula (h-0 + posição absoluta: não ocupa espaço, a primeira seção começa no topo).
- * Logo centralizado no desktop; links dos dois lados.
+ * Logo à esquerda; links e botão de agendamento à direita.
  */
 export function SiteHeader() {
-  const left = mainNav.slice(0, 2);
-  const right = mainNav.slice(2);
   return (
     <header className="sticky top-0 z-50 h-0">
       <div className="container-mk pt-3 md:pt-4">
-        <div className="relative mx-auto flex max-w-[60rem] items-center justify-between rounded-[1.5rem] bg-surface px-3 py-2 shadow-md ring-1 ring-brand-ink/5 md:px-4">
-          <Link
-            href={routes.home}
-            aria-label="MK Design — página inicial"
-            className="flex min-h-11 items-center px-2 md:absolute md:left-1/2 md:-translate-x-1/2"
-          >
+        <div className="relative mx-auto flex max-w-[60rem] items-center justify-between gap-4 rounded-[1.5rem] bg-surface px-3 py-2 shadow-md ring-1 ring-brand-ink/5 md:px-4">
+          <Link href={routes.home} aria-label="MK Design — página inicial" className="flex min-h-11 items-center px-2">
             <Image src={siteConfig.logo.srcTrim} alt="" width={951} height={862} priority className="h-10 w-auto" />
           </Link>
-          <nav aria-label="Principal" className="hidden w-full items-center justify-between md:flex">
+          <nav aria-label="Principal" className="ml-auto hidden items-center md:flex">
             <ul className="flex items-center gap-1">
-              {left.map((item) => (
+              {mainNav.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className={linkClass}>
                     {item.label}
                   </Link>
                 </li>
               ))}
-            </ul>
-            <ul className="flex items-center gap-1">
-              {right.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className={linkClass}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-              <li>
+              <li className="pl-2">
                 <Button asChild size="sm" variant="dark" className="rounded-xl!">
                   <Link href={routes.booking}>Agendar serviço</Link>
                 </Button>
