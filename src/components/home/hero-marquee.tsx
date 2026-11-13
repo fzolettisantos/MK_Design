@@ -51,7 +51,7 @@ export function HeroMarquee() {
   // Uma "metade" precisa ser mais larga que telas grandes; o keyframe desloca -50% (uma metade).
   const half = [...cards, ...cards];
   return (
-    <div aria-hidden="true" className="mk-marquee-hover overflow-hidden pb-4 pt-6">
+    <div aria-hidden="true" className="mk-marquee-hover overflow-hidden pb-20 pt-6">
       <div className="mk-marquee flex w-max" style={{ "--mk-marquee-time": "70s" } as React.CSSProperties}>
         {[...half, ...half].map((c, i) => (
           <Tile key={i} c={c} />

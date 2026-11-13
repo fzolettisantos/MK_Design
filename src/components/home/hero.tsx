@@ -73,7 +73,7 @@ export function Hero() {
           <MotionToggle />
         </div>
       </div>
-      <div className="mk-rise relative mt-2 pb-14 md:mt-4 md:pb-20" style={d(520)}>
+      <div className="mk-rise relative mt-2 pb-16 md:mt-4 md:pb-24" style={d(520)}>
         <HeroMarquee />
       </div>
     </section>
