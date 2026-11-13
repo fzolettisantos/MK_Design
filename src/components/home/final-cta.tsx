@@ -11,7 +11,7 @@ import { finalCta, hero } from "@/content/home";
 /**
  * Seção final com foto de fundo e borda superior reta. Ao entrar na tela (`--p` de 0 a 1):
  * o conteúdo desce de baixo da borda até a posição final (e ganha opacidade) e a foto faz parallax
- * (sobe devagar e reduz o zoom). Degradês: esquerda → preto (legibilidade) e base → preto (emenda com o rodapé escuro).
+ * (sobe devagar e reduz o zoom). Camada de preto semitransparente sobre a foto (legibilidade) e degradê na base → preto (emenda com o rodapé escuro).
  */
 export function FinalCta() {
   return (
@@ -25,15 +25,15 @@ export function FinalCta() {
         style={{ transform: "translateY(calc((1 - var(--p)) * -56px)) scale(calc(1 + (1 - var(--p)) * 0.12))" }}
       >
         <Image
-          src="/images/banners/hero-tv.webp"
+          src="/images/banners/cta-bg.webp"
           alt=""
           fill
           sizes="100vw"
-          className="object-cover object-[50%_30%]"
+          className="object-cover object-[50%_40%]"
         />
       </div>
-      <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-brand-ink via-brand-ink/70 to-brand-ink/15" />
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-brand-ink to-transparent" />
+      <div aria-hidden="true" className="absolute inset-0 bg-brand-ink/65" />
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-brand-ink to-transparent" />
 
       <div
         className="container-mk relative grid items-start gap-10 will-change-transform md:grid-cols-[minmax(0,1fr)_auto]"
