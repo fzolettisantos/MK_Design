@@ -4,7 +4,7 @@ import { routes } from "@/config/routes";
 export const hero = {
   eyebrow: "INSTALAÇÃO E ASSISTÊNCIA TÉCNICA",
   title: "Sua TV no lugar certo. Sem complicação.",
-  /** Trecho do título em serifa itálica. */
+  /** Trecho do título em destaque. */
   titleEmphasis: "Sem complicação.",
   text: "Instalação de TVs, suportes, painéis e assistência técnica em um só lugar. Escolha o serviço, selecione o melhor horário disponível e fale diretamente com a MK Design.",
   primaryCta: "Escolher um serviço",

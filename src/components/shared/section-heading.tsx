@@ -4,7 +4,7 @@ import { EmphasizedText } from "./emphasized-text";
 interface Props {
   eyebrow?: string;
   title: string;
-  /** Trecho de `title` exibido em serifa itálica. */
+  /** Trecho de `title` em destaque. */
   emphasis?: string;
   id?: string;
   className?: string;

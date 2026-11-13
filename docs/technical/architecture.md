@@ -1,7 +1,7 @@
 # Arquitetura técnica
 
 ## Stack (versões verificadas em 13/11/2026)
-Next.js 16.4 (App Router) · React 19.3 · TypeScript 5.9 (strict) · Tailwind CSS 4.3 (`@theme`, sem `tailwind.config.js`) · shadcn/ui (`components.json`, estilo new-york, componentes em `src/components/ui`) · Lucide React · react-hook-form + Zod 4 · date-fns 4 · Vitest. Fontes self-hosted via `@fontsource-variable` (Outfit; Playfair Display Itálica só nas ênfases): sem requisição ao Google no build/runtime.
+Next.js 16.4 (App Router) · React 19.3 · TypeScript 5.9 (strict) · Tailwind CSS 4.3 (`@theme`, sem `tailwind.config.js`) · shadcn/ui (`components.json`, estilo new-york, componentes em `src/components/ui`) · Lucide React · react-hook-form + Zod 4 · date-fns 4 · Vitest. Fontes self-hosted via `@fontsource-variable` (somente Outfit): sem requisição ao Google no build/runtime.
 Node ≥ 20.9.
 
 ## Estrutura

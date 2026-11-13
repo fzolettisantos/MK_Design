@@ -25,9 +25,8 @@
   --mk-focus: #2456d3;
 
   /* Tipografia */
-  /* Uma só família no site todo (Outfit); serifa itálica apenas nas ênfases (--mk-font-accent) */
+  /* Uma só família em todo o site: Outfit */
   --mk-font-heading: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --mk-font-accent: "Playfair Display Variable", "Playfair Display", ui-serif, Georgia, serif; /* ênfase em itálico */
   --mk-font-body: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
 
   /* Escala tipográfica fluida (mobile → desktop) — tamanho / line-height */

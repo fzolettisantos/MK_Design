@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Destaca um trecho do título em serifa itálica (referência visual). `tone="dark"` usa lime,
- * que só aparece sobre fundo escuro; em fundos claros/lime a ênfase herda a cor do texto.
+ * Destaca um trecho do título. Mesma fonte e peso do restante (Outfit); `accent` pinta o trecho em lime,
+ * o que só deve ser usado sobre fundo escuro (brand-ink). Em fundos claros/lime o trecho herda a cor.
  */
 export function EmphasizedText({
   text,
@@ -11,7 +11,7 @@ export function EmphasizedText({
 }: {
   text: string;
   emphasis?: string;
-  /** Pinta a ênfase em lime (somente sobre brand-ink). */
+  /** Pinta o destaque em lime (somente sobre brand-ink). */
   accent?: boolean;
 }) {
   const i = emphasis ? text.indexOf(emphasis) : -1;
@@ -19,9 +19,7 @@ export function EmphasizedText({
   return (
     <>
       {text.slice(0, i)}
-      <em className={cn("font-accent text-[1.02em] font-extrabold italic tracking-normal", accent && "text-brand-primary")}>
-        {emphasis}
-      </em>
+      <em className={cn("not-italic", accent && "text-brand-primary")}>{emphasis}</em>
       {text.slice(i + emphasis.length)}
     </>
   );
