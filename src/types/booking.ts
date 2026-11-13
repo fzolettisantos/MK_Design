@@ -26,6 +26,8 @@ export interface Service {
   description: string;
   /** Informações que o cliente deve ter à mão ao solicitar (espelham as etapas do wizard). */
   infoNeeded: string[];
+  /** Foto opcional de fundo do cabeçalho da página de detalhe. */
+  heroImage?: string;
   durationMinutes: number | null; // definido no painel; null = ainda não configurado
   priceMode: "sob_orcamento"; // não inventar preços
   active: boolean;
