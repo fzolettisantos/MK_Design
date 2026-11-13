@@ -1,15 +1,23 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
 import type { Service, ServiceCategory, ServiceCategoryId } from "@/types";
 import { ServiceCard } from "./service-card";
 
-type Filter = ServiceCategoryId | "todos";
+export type Filter = ServiceCategoryId | "todos";
 
 /** Filtro por categoria (ServiceCategoryFilter) + grade de cards. Botões com aria-pressed; contagem anunciada. */
-export function ServiceCatalog({ services, categories }: { services: Service[]; categories: ServiceCategory[] }) {
-  const [filter, setFilter] = React.useState<Filter>("todos");
+export function ServiceCatalog({
+  services,
+  categories,
+  filter,
+  onFilterChange: setFilter,
+}: {
+  services: Service[];
+  categories: ServiceCategory[];
+  filter: Filter;
+  onFilterChange: (f: Filter) => void;
+}) {
   const names = Object.fromEntries(categories.map((c) => [c.id, c.name]));
   const visible = filter === "todos" ? services : services.filter((s) => s.categoryId === filter);
   const options: { id: Filter; label: string }[] = [

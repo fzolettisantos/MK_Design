@@ -6,7 +6,7 @@ import type { Service, ServiceCategory } from "@/types";
  * de garantia/prazo/assistência autorizada. Itens a confirmar com o proprietário ficam `active: false`.
  */
 export const categories: ServiceCategory[] = [
-  { id: "instalacao-tv", name: "Instalação de TVs", order: 1 },
+  { id: "instalacao-tv", name: "Instalação de TVs", order: 1, heroImage: "/images/banners/servico-parede-bg.webp" },
   { id: "instalacao-suporte", name: "Instalação de suportes", order: 2 },
   { id: "assistencia-tecnica", name: "Assistência técnica", order: 3 },
 ];
@@ -38,7 +38,6 @@ export const services: Service[] = [
     summary: "Instalação da TV na parede, conforme as características do ambiente.",
     description: "Instalação da sua TV na parede. A equipe avalia o local, o tipo de suporte e o tamanho da TV para orientar a melhor forma de instalar.",
     infoNeeded: installInfo, durationMinutes: null, priceMode: "sob_orcamento", active: true, order: 1,
-    heroImage: "/images/banners/servico-parede-bg.webp",
   },
   {
     id: "tv-painel", slug: "instalacao-de-tv-em-painel", categoryId: "instalacao-tv",

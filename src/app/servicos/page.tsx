@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { ServiceCatalog } from "@/components/services/service-catalog";
-import { PageBody, PageHero } from "@/components/shared/page-hero";
+import { ServicesExplorer } from "@/components/services/services-explorer";
 import { serviceRepository } from "@/lib/repositories";
 
 export const metadata: Metadata = {
@@ -14,20 +13,5 @@ export default async function ServicesPage() {
     serviceRepository.list({ onlyActive: true }),
     serviceRepository.listCategories(),
   ]);
-
-  return (
-    <>
-      <PageHero id="servicos-title" eyebrow="O QUE FAZEMOS" title="Serviços">
-        <p className="max-w-2xl text-lg text-surface/85">
-          Da instalação ao reparo, conte com a MK Design. Escolha um serviço para ver os detalhes. Valores sob
-          orçamento, informados na confirmação do atendimento.
-        </p>
-      </PageHero>
-      <PageBody>
-        <div className="container-mk">
-          <ServiceCatalog services={services} categories={categories} />
-        </div>
-      </PageBody>
-    </>
-  );
+  return <ServicesExplorer services={services} categories={categories} />;
 }

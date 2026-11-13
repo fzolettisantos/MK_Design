@@ -45,7 +45,7 @@ export default async function ServicePage({ params }: { params: Params }) {
     <>
       <PageHero
         id="servico-title"
-        image={service.heroImage}
+        image={service.heroImage ?? category?.heroImage}
         title={service.name}
         eyebrow={category?.name}
         breadcrumbs={

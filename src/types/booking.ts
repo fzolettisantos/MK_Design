@@ -14,6 +14,8 @@ export interface ServiceCategory {
   id: ServiceCategoryId;
   name: string;
   order: number;
+  /** Foto de fundo do cabeçalho; os serviços da categoria herdam (a menos que tenham a própria). */
+  heroImage?: string;
 }
 
 export interface Service {
