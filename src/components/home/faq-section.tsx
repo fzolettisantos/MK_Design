@@ -4,9 +4,17 @@ import { faq } from "@/content/home";
 
 export function FaqSection() {
   return (
-    <section aria-labelledby="faq-title" className="mk-stack bg-surface-muted py-16 md:py-24">
-      <div className="container-mk grid gap-10 lg:grid-cols-[1fr_2fr]">
-        <SectionHeading id="faq-title" title={faq.title} emphasis={faq.emphasis} />
+    <section aria-labelledby="faq-title" className="mk-stack bg-brand-ink py-16 text-surface md:py-28">
+      <div className="container-mk flex flex-col gap-12 md:gap-16">
+        <SectionHeading
+          align="center"
+          tone="dark"
+          id="faq-title"
+          eyebrow="FAQ"
+          title={faq.title}
+          emphasis={faq.emphasis}
+          className="[&_h2]:text-[clamp(2.25rem,1.4rem+3.2vw,4rem)] [&_h2]:leading-[1.02] [&_h2]:tracking-[-0.03em]"
+        />
         <FAQAccordion items={faq.items} />
       </div>
     </section>
