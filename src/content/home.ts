@@ -4,8 +4,8 @@ import { routes } from "@/config/routes";
 export const hero = {
   eyebrow: "INSTALAÇÃO E ASSISTÊNCIA TÉCNICA",
   title: "Sua TV no lugar certo. Sem complicação.",
-  /** Trecho do título destacado na cor de acento. */
-  titleAccent: "Sua TV",
+  /** Trecho do título em serifa itálica. */
+  titleEmphasis: "Sem complicação.",
   text: "Instalação de TVs, suportes, painéis e assistência técnica em um só lugar. Escolha o serviço, selecione o melhor horário disponível e fale diretamente com a MK Design.",
   primaryCta: "Escolher um serviço",
   secondaryCta: "Falar pelo WhatsApp",
@@ -15,6 +15,7 @@ export const hero = {
 export const services = {
   eyebrow: "O QUE FAZEMOS",
   title: "Da instalação ao reparo, conte com a MK Design.",
+  emphasis: "MK Design",
   cards: [
     {
       icon: "tv",
@@ -42,6 +43,7 @@ export const services = {
 
 export const howItWorks = {
   title: "Resolva tudo em poucos passos.",
+  emphasis: "poucos passos",
   steps: [
     { title: "Escolha o serviço", text: "Selecione o tipo de instalação ou reparo que você precisa." },
     { title: "Informe os detalhes", text: "Conte onde será feito o serviço e, se necessário, o modelo da TV." },
@@ -52,6 +54,7 @@ export const howItWorks = {
 
 export const benefits = {
   title: "Atendimento simples, desde o primeiro contato.",
+  emphasis: "simples",
   items: [
     { icon: "choose", title: "Escolha fácil do serviço" },
     { icon: "calendar", title: "Agendamento organizado" },
@@ -62,6 +65,7 @@ export const benefits = {
 
 export const payments = {
   title: "Pague do jeito que preferir.",
+  emphasis: "do jeito que preferir",
   text: "Aceitamos Pix, cartão de débito e cartão de crédito das bandeiras Visa, Mastercard e Elo.",
   note: "Condições de pagamento e valores informados na confirmação do serviço.",
   methods: ["Pix", "Cartão de débito", "Crédito Visa, Mastercard e Elo"],
@@ -69,6 +73,7 @@ export const payments = {
 
 export const faq = {
   title: "Perguntas frequentes",
+  emphasis: "frequentes",
   items: [
     {
       q: "Posso agendar pelo site?",
@@ -96,6 +101,17 @@ export const faq = {
 
 export const finalCta = {
   title: "Vamos resolver o que você precisa?",
+  emphasis: "você precisa",
   text: "Escolha um serviço e encontre um horário para seu atendimento.",
   button: "Agendar atendimento",
 } as const;
+
+/** Letreiro sob o menu — apenas fatos já definidos no guia. */
+export const ticker = [
+  "Instalação de TVs",
+  "Suportes fixos, articulados, de teto e pedestal",
+  "Assistência técnica",
+  "Agendamento pelo site",
+  "Atendimento via WhatsApp",
+  "Pix, débito e crédito",
+] as const;

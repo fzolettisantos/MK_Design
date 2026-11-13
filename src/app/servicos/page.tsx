@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ServiceCatalog } from "@/components/services/service-catalog";
-import { PageHero } from "@/components/shared/page-hero";
+import { PageBody, PageHero } from "@/components/shared/page-hero";
 import { serviceRepository } from "@/lib/repositories";
 
 export const metadata: Metadata = {
@@ -23,9 +23,11 @@ export default async function ServicesPage() {
           orçamento, informados na confirmação do atendimento.
         </p>
       </PageHero>
-      <div className="container-mk pb-16 md:pb-24">
-        <ServiceCatalog services={services} categories={categories} />
-      </div>
+      <PageBody>
+        <div className="container-mk">
+          <ServiceCatalog services={services} categories={categories} />
+        </div>
+      </PageBody>
     </>
   );
 }

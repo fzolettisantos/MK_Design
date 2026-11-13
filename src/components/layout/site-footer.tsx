@@ -6,9 +6,8 @@ import { siteConfig } from "@/config/site";
 
 export function SiteFooter() {
   return (
-    <footer className="bg-brand-ink text-surface">
-      <div className="h-1.5 bg-brand-primary" aria-hidden="true" />
-      <div className="container-mk grid gap-10 py-12 md:grid-cols-3">
+    <footer className="mk-stack bg-brand-ink text-surface">
+      <div className="container-mk grid gap-10 pb-12 pt-16 md:grid-cols-3">
         <div className="flex flex-col gap-3">
           <Image src={siteConfig.logo.srcOnDark} alt="MK Design" width={951} height={862} className="h-16 w-auto self-start" />
           <p className="max-w-xs text-sm text-surface/80">

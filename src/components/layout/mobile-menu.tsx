@@ -19,18 +19,14 @@ export function MobileMenu() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [open, close]);
 
   return (
     <div className="md:hidden">
       <Button
         ref={buttonRef}
-        variant="ghostLight"
+        variant="ghost"
         size="icon"
         aria-expanded={open}
         aria-controls="menu-mobile"
@@ -43,22 +39,22 @@ export function MobileMenu() {
         <nav
           id="menu-mobile"
           aria-label="Menu principal"
-          className="absolute inset-x-0 top-full z-40 h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-surface/10 bg-brand-ink text-surface"
+          className="absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-[2rem] bg-surface p-4 shadow-md ring-1 ring-brand-ink/5"
         >
-          <ul className="container-mk flex flex-col py-4">
+          <ul className="flex flex-col">
             {mainNav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-14 items-center border-b border-surface/15 font-heading text-xl font-semibold"
+                  className="flex min-h-14 items-center border-b border-border px-3 font-heading text-xl font-semibold"
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
-            <li className="pt-6">
-              <Button asChild className="w-full">
+            <li className="pt-4">
+              <Button asChild variant="dark" className="w-full">
                 <Link href={routes.booking} onClick={() => setOpen(false)}>
                   Agendar serviço
                 </Link>

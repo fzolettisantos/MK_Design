@@ -3,9 +3,9 @@ import { howItWorks } from "@/content/home";
 
 export function HowItWorks() {
   return (
-    <section aria-labelledby="como-title" className="bg-surface-muted py-16 md:py-24">
+    <section aria-labelledby="como-title" className="mk-stack bg-surface-muted py-16 md:py-24">
       <div className="container-mk flex flex-col gap-10">
-        <SectionHeading id="como-title" title={howItWorks.title} className="max-w-3xl" />
+        <SectionHeading id="como-title" title={howItWorks.title} emphasis={howItWorks.emphasis} className="max-w-3xl" />
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {howItWorks.steps.map((s, i) => (
             <li key={s.title} className="flex flex-col gap-4 rounded-card bg-surface p-6">

@@ -1,31 +1,30 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { ArcLine } from "@/components/shared/arc-line";
-import { CurveDivider } from "@/components/shared/curve-divider";
+import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui";
 import { routes } from "@/config/routes";
 import { finalCta } from "@/content/home";
 
+/** Fecha a página com o mesmo bloco lime do hero (texto sempre em brand-ink). */
 export function FinalCta() {
   return (
-    <>
-      <CurveDivider from="muted" to="ink" flip />
-      <section aria-labelledby="cta-title" className="relative overflow-hidden bg-brand-ink pb-16 text-surface md:pb-24">
-        <div aria-hidden="true" className="absolute -bottom-40 -right-32 hidden size-[34rem] rounded-full bg-brand-primary lg:block" />
-        <ArcLine className="pointer-events-none absolute -right-16 -top-10 hidden size-[24rem] rotate-180 text-brand-primary/60 md:block" />
-        <div className="container-mk relative flex flex-col items-start gap-6">
-          <h2 id="cta-title" className="max-w-xl">
-            Vamos resolver o que <span className="text-brand-primary">você precisa</span>?
-          </h2>
-          <p className="max-w-xl text-lg text-surface/85">{finalCta.text}</p>
-          <Button asChild>
-            <Link href={routes.booking}>
-              {finalCta.button}
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-    </>
+    <section aria-labelledby="cta-title" className="mk-stack bg-brand-primary py-20 text-brand-ink md:py-28">
+      <div className="container-mk flex flex-col items-center gap-6 text-center">
+        <SectionHeading
+          align="center"
+          id="cta-title"
+          title={finalCta.title}
+          emphasis={finalCta.emphasis}
+          className="max-w-3xl [&_h2]:text-[clamp(2rem,1.2rem+3.6vw,4rem)] [&_h2]:leading-[1.05]"
+        />
+        <p className="max-w-xl text-lg text-brand-ink/85">{finalCta.text}</p>
+        <Button asChild variant="dark">
+          <Link href={routes.booking}>
+            {finalCta.button}
+            <ArrowRight aria-hidden="true" />
+          </Link>
+        </Button>
+      </div>
+    </section>
   );
 }

@@ -1,29 +1,29 @@
-import { ArcLine } from "./arc-line";
-import { CurveDivider } from "./curve-divider";
 import { SectionHeading } from "./section-heading";
 
 interface Props {
   id: string;
   title: string;
   eyebrow?: string;
+  emphasis?: string;
   /** Migalhas de pão (tom escuro) exibidas acima do título. */
   breadcrumbs?: React.ReactNode;
   children?: React.ReactNode;
 }
 
-/** Cabeçalho escuro das páginas internas, com arco decorativo e base curva. */
-export function PageHero({ id, title, eyebrow, breadcrumbs, children }: Props) {
+/** Cabeçalho escuro das páginas internas; a próxima seção (`PageBody`) a sobrepõe com topo arredondado. */
+export function PageHero({ id, title, eyebrow, emphasis, breadcrumbs, children }: Props) {
   return (
-    <>
-      <section aria-labelledby={id} className="relative overflow-hidden bg-brand-ink text-surface">
-        <ArcLine className="pointer-events-none absolute -right-10 -top-10 hidden size-[18rem] rotate-180 text-brand-primary/70 md:block" />
-        <div className="container-mk relative flex flex-col gap-6 pb-12 pt-6 md:pb-16 md:pt-10">
-          {breadcrumbs}
-          <SectionHeading as="h1" tone="dark" id={id} eyebrow={eyebrow} title={title} />
-          {children}
-        </div>
-      </section>
-      <CurveDivider from="ink" to="surface" />
-    </>
+    <section aria-labelledby={id} className="bg-brand-ink pb-16 pt-[6.5rem] text-surface md:pb-24 md:pt-32">
+      <div className="container-mk flex flex-col gap-6">
+        {breadcrumbs}
+        <SectionHeading as="h1" tone="dark" id={id} eyebrow={eyebrow} title={title} emphasis={emphasis} />
+        {children}
+      </div>
+    </section>
   );
+}
+
+/** Corpo claro que sobe sobre o PageHero. */
+export function PageBody({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={`mk-stack bg-surface pb-16 pt-12 md:pb-24 md:pt-16 ${className ?? ""}`}>{children}</div>;
 }

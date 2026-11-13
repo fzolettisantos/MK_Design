@@ -8,9 +8,9 @@ const icons = { tv: Tv, support: Hammer, repair: Wrench } as const;
 
 export function ServicesSection() {
   return (
-    <section aria-labelledby="servicos-title" className="py-12 md:py-20">
+    <section aria-labelledby="servicos-title" className="mk-stack bg-surface py-16 md:py-24">
       <div className="container-mk flex flex-col gap-10">
-        <SectionHeading id="servicos-title" eyebrow={services.eyebrow} title={services.title} className="max-w-3xl" />
+        <SectionHeading id="servicos-title" eyebrow={services.eyebrow} title={services.title} emphasis={services.emphasis} className="max-w-3xl" />
         <ul className="grid gap-4 md:grid-cols-3 md:gap-6">
           {services.cards.map((c) => {
             const Icon = icons[c.icon];

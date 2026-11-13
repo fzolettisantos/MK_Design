@@ -4,9 +4,10 @@ import { payments } from "@/content/home";
 
 export function Payments() {
   return (
-    <section aria-labelledby="pagamentos-title" className="container-mk grid items-center gap-8 py-12 md:grid-cols-2 md:py-20">
+    <section aria-labelledby="pagamentos-title" className="mk-stack bg-surface py-16 md:py-24">
+      <div className="container-mk grid items-center gap-8 md:grid-cols-2">
       <div className="flex flex-col gap-4">
-        <SectionHeading id="pagamentos-title" title={payments.title} />
+        <SectionHeading id="pagamentos-title" title={payments.title} emphasis={payments.emphasis} />
         <p className="text-lg text-text-secondary">{payments.text}</p>
         <p className="text-sm text-text-secondary">{payments.note}</p>
       </div>
@@ -20,6 +21,7 @@ export function Payments() {
           </li>
         ))}
       </ul>
+      </div>
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, Check } from "lucide-react";
 import { ServiceCard } from "@/components/services/service-card";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
-import { PageHero } from "@/components/shared/page-hero";
+import { PageBody, PageHero } from "@/components/shared/page-hero";
 import { WhatsAppCTA } from "@/components/shared/whatsapp-cta";
 import { Alert, Button } from "@/components/ui";
 import { routes } from "@/config/routes";
@@ -61,7 +61,8 @@ export default async function ServicePage({ params }: { params: Params }) {
         <p className="max-w-2xl text-lg text-surface/85">{service.description}</p>
       </PageHero>
 
-      <div className="container-mk grid gap-10 pb-16 lg:grid-cols-[2fr_1fr] md:pb-24">
+      <PageBody>
+      <div className="container-mk grid gap-10 lg:grid-cols-[2fr_1fr]">
         <div className="flex flex-col gap-8">
           <section aria-labelledby="info-title" className="flex flex-col gap-4">
             <h2 id="info-title">Tenha à mão ao solicitar</h2>
@@ -98,9 +99,10 @@ export default async function ServicePage({ params }: { params: Params }) {
           </div>
         </aside>
       </div>
+      </PageBody>
 
       {related.length > 0 && (
-        <section aria-labelledby="rel-title" className="bg-surface-muted py-12 md:py-16">
+        <section aria-labelledby="rel-title" className="mk-stack bg-surface-muted pb-16 pt-16 md:pb-24">
           <div className="container-mk flex flex-col gap-8">
             <h2 id="rel-title">Outros serviços em {category?.name}</h2>
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">

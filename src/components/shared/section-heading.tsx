@@ -1,32 +1,44 @@
 import { cn } from "@/lib/utils";
+import { EmphasizedText } from "./emphasized-text";
 
 interface Props {
   eyebrow?: string;
   title: string;
+  /** Trecho de `title` exibido em serifa itálica. */
+  emphasis?: string;
   id?: string;
   className?: string;
   as?: "h1" | "h2";
   /** "dark" para fundos brand-ink. */
   tone?: "light" | "dark";
+  align?: "left" | "center";
 }
 
-export function SectionHeading({ eyebrow, title, id, className, as: Tag = "h2", tone = "light" }: Props) {
+export function SectionHeading({
+  eyebrow,
+  title,
+  emphasis,
+  id,
+  className,
+  as: Tag = "h2",
+  tone = "light",
+  align = "left",
+}: Props) {
   const dark = tone === "dark";
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
+    <div className={cn("flex flex-col gap-3", align === "center" && "items-center text-center", className)}>
       {eyebrow && (
         <p
           className={cn(
-            "flex items-center gap-3 text-sm font-semibold uppercase tracking-widest",
-            dark ? "text-surface/75" : "text-text-secondary",
+            "text-sm font-semibold uppercase tracking-widest",
+            dark ? "text-surface/75" : "text-brand-ink/75",
           )}
         >
-          <span aria-hidden="true" className="h-1 w-8 rounded-full bg-brand-primary" />
           {eyebrow}
         </p>
       )}
       <Tag id={id} className={dark ? "text-surface" : undefined}>
-        {title}
+        <EmphasizedText text={title} emphasis={emphasis} accent={dark} />
       </Tag>
     </div>
   );

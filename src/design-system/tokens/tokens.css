@@ -26,6 +26,7 @@
 
   /* Tipografia */
   --mk-font-heading: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --mk-font-accent: "Instrument Serif", ui-serif, Georgia, serif; /* ênfase em itálico */
   --mk-font-body: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
 
   /* Escala tipográfica fluida (mobile → desktop) — tamanho / line-height */

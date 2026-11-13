@@ -28,8 +28,12 @@ Estúdio técnico contemporâneo: preto/branco + detalhes lime, faixas `surface-
 Preservar monograma MK, moldura aberta, lime + preto, DESIGN espaçado. Versões a produzir: horizontal, vertical, monograma/favicon, claro/escuro, SVG fiel.
 
 ## Direção visual vigente (nov/2026)
-Referência: posts de assistência de TV — fundo escuro dominante, título pesado com palavras-chave na cor de acento, formas curvas grandes, botões em pílula, selo de seta em quadrado arredondado, TV como protagonista. **Mantém a paleta MK** (lime `#E4F000`, preto `#171717`, branco). Isto sobrepõe os raios do style guide original (§3).
-- Seções alternam `brand-ink` / `surface` / `surface-muted`, unidas por `CurveDivider`.
-- Lime em formas e acentos; **texto sobre lime sempre `brand-ink`**; nada de branco sobre lime. Decorações (arcos, círculos) nunca ficam atrás de texto.
-- Fundo escuro: texto `surface` ou `surface/75+`; botões `outlineLight`/`ghostLight`; logo `mk-design-logo-trim-on-dark.png`.
+Referência de layout: broworks.net (apenas o design; abas, seções e copy são da MK). **Paleta MK mantida** (lime `#E4F000`, preto `#171717`, branco). Isto sobrepõe os raios do style guide original (§3).
+- **Menu:** pílula branca flutuante (logo centralizado no desktop), botão `Agendar serviço` escuro em pílula.
+- **Hero:** bloco lime chapado, centralizado; letreiro fino sob o menu; título grande com a frase final em **serifa itálica** (`EmphasizedText`, fonte Instrument Serif); cartões inclinados passando (`HeroMarquee`) com botão de pausa (`MotionToggle`, WCAG 2.2.2).
+- **Seções empilhadas:** cada seção sobrepõe a anterior com topo arredondado (`.mk-stack`), alternando `surface` / `surface-muted` / `brand-ink` / lime.
+- **Ênfase:** em fundo escuro a serifa itálica vai em lime; em fundo claro ou lime herda `brand-ink`.
+- **Lime:** blocos grandes só com texto `brand-ink`; nunca branco sobre lime; lime nunca como cor de texto sobre branco.
+- Fundo escuro: texto `surface` ou `surface/75+`; logo `mk-design-logo-trim-on-dark.png`; fundo claro/lime: `mk-design-logo-trim.png`.
+- Movimento: só CSS; respeita `prefers-reduced-motion`; conteúdo em movimento é decorativo (`aria-hidden`) e pausável.
 - Copy: não replicar promessas de referências (ex.: "garantia") — ver regras de conteúdo.
