@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/site";
 import { MobileMenu } from "./mobile-menu";
 
 const linkClass =
-  "flex min-h-11 items-center rounded-full px-4 font-semibold transition-colors duration-150 hover:bg-surface-muted";
+  "flex min-h-11 items-center rounded-xl px-4 font-semibold transition-colors duration-150 hover:bg-surface-muted";
 
 /**
  * Menu flutuante em pílula (h-0 + posição absoluta: não ocupa espaço, a primeira seção começa no topo).
@@ -18,7 +18,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 h-0">
       <div className="container-mk pt-3 md:pt-4">
-        <div className="relative mx-auto flex max-w-[60rem] items-center justify-between rounded-full bg-surface px-3 py-2 shadow-md ring-1 ring-brand-ink/5 md:px-4">
+        <div className="relative mx-auto flex max-w-[60rem] items-center justify-between rounded-[1.5rem] bg-surface px-3 py-2 shadow-md ring-1 ring-brand-ink/5 md:px-4">
           <Link
             href={routes.home}
             aria-label="MK Design — página inicial"
@@ -45,7 +45,7 @@ export function SiteHeader() {
                 </li>
               ))}
               <li>
-                <Button asChild size="sm" variant="dark">
+                <Button asChild size="sm" variant="dark" className="rounded-xl!">
                   <Link href={routes.booking}>Agendar serviço</Link>
                 </Button>
               </li>

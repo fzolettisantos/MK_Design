@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/inter";
-import "@fontsource-variable/space-grotesk";
+import "@fontsource-variable/outfit";
 import "@fontsource/instrument-serif/latin-400-italic.css";
 import "./globals.css";
 import { SiteFooter } from "@/components/layout/site-footer";

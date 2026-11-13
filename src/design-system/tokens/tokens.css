@@ -25,9 +25,10 @@
   --mk-focus: #2456d3;
 
   /* Tipografia */
-  --mk-font-heading: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  /* Uma só família no site todo (Outfit); serifa itálica apenas nas ênfases (--mk-font-accent) */
+  --mk-font-heading: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
   --mk-font-accent: "Instrument Serif", ui-serif, Georgia, serif; /* ênfase em itálico */
-  --mk-font-body: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --mk-font-body: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
 
   /* Escala tipográfica fluida (mobile → desktop) — tamanho / line-height */
   --mk-text-h1: clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem); /* 36 → 56 */

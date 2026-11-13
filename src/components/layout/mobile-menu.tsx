@@ -39,7 +39,7 @@ export function MobileMenu() {
         <nav
           id="menu-mobile"
           aria-label="Menu principal"
-          className="absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-[2rem] bg-surface p-4 shadow-md ring-1 ring-brand-ink/5"
+          className="absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-[1.5rem] bg-surface p-4 shadow-md ring-1 ring-brand-ink/5"
         >
           <ul className="flex flex-col">
             {mainNav.map((item) => (
@@ -54,7 +54,7 @@ export function MobileMenu() {
               </li>
             ))}
             <li className="pt-4">
-              <Button asChild variant="dark" className="w-full">
+              <Button asChild variant="dark" className="w-full rounded-xl!">
                 <Link href={routes.booking} onClick={() => setOpen(false)}>
                   Agendar serviço
                 </Link>
