@@ -33,8 +33,8 @@ export function ServicesSection() {
                 <Image
                   src={c.image}
                   alt={c.imageAlt}
-                  width={770}
-                  height={592}
+                  width={1122}
+                  height={863}
                   sizes="(min-width: 768px) 45vw, 100vw"
                   className="aspect-[13/10] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
