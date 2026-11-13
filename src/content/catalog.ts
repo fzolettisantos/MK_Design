@@ -105,5 +105,6 @@ export const services: Service[] = [
     summary: "Solicite o conserto da sua TV. Recebemos pedidos para Samsung, Sony, TCL, LG e Philips, e outras marcas mediante consulta.",
     description: "Solicite o conserto da sua TV. Recebemos solicitações para Samsung, Sony, TCL, LG e Philips, além de outras marcas mediante consulta. A equipe avalia as informações e orienta sobre o orçamento.",
     infoNeeded: repairInfo, durationMinutes: null, priceMode: "sob_orcamento", active: true, order: 10,
+    heroImage: "/images/banners/servico-conserto-bg.webp",
   },
 ];
