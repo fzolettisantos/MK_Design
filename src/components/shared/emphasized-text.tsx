@@ -19,7 +19,7 @@ export function EmphasizedText({
   return (
     <>
       {text.slice(0, i)}
-      <em className={cn("font-accent text-[1.14em] font-normal italic tracking-normal", accent && "text-brand-primary")}>
+      <em className={cn("font-accent text-[1.02em] font-extrabold italic tracking-normal", accent && "text-brand-primary")}>
         {emphasis}
       </em>
       {text.slice(i + emphasis.length)}

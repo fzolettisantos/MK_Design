@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/outfit";
-import "@fontsource/instrument-serif/latin-400-italic.css";
+import "@fontsource-variable/playfair-display/wght-italic.css";
 import "./globals.css";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
