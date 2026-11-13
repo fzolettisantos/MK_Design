@@ -7,7 +7,7 @@ import type { Service, ServiceCategory } from "@/types";
  */
 export const categories: ServiceCategory[] = [
   { id: "instalacao-tv", name: "Instalação de TVs", order: 1, heroImage: "/images/banners/servico-parede-bg.webp" },
-  { id: "instalacao-suporte", name: "Instalação de suportes", order: 2 },
+  { id: "instalacao-suporte", name: "Instalação de suportes", order: 2, heroImage: "/images/banners/servico-suporte-fixo-bg.webp" },
   { id: "assistencia-tecnica", name: "Assistência técnica", order: 3 },
 ];
 
@@ -68,7 +68,6 @@ export const services: Service[] = [
     summary: "Instalação de suporte fixo, com a TV rente à parede.",
     description: "Instalação de suporte fixo. Informe o modelo da TV para avaliarmos a instalação.",
     infoNeeded: supportInfo, durationMinutes: null, priceMode: "sob_orcamento", active: true, order: 5,
-    heroImage: "/images/banners/servico-suporte-fixo-bg.webp",
   },
   {
     id: "suporte-articulado", slug: "instalacao-de-suporte-articulado", categoryId: "instalacao-suporte",
