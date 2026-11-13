@@ -11,13 +11,13 @@ import { finalCta, hero } from "@/content/home";
 /**
  * Seção final com foto de fundo e borda superior reta. Ao entrar na tela (`--p` de 0 a 1):
  * o conteúdo desce de baixo da borda até a posição final (e ganha opacidade) e a foto faz parallax
- * (sobe devagar e reduz o zoom). Degradês: esquerda → preto (legibilidade) e base → preto (rodapé sobe).
+ * (sobe devagar e reduz o zoom). Degradês: esquerda → preto (legibilidade) e base → preto (emenda com o rodapé escuro).
  */
 export function FinalCta() {
   return (
     <ScrollProgressSection
       aria-labelledby="cta-title"
-      className="relative overflow-hidden bg-brand-ink pb-64 pt-24 text-surface [--p:1] md:pb-72 md:pt-32"
+      className="relative overflow-hidden bg-brand-ink pb-28 pt-24 text-surface [--p:1] md:pb-36 md:pt-32"
     >
       <div
         aria-hidden="true"
@@ -33,7 +33,7 @@ export function FinalCta() {
         />
       </div>
       <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-brand-ink via-brand-ink/70 to-brand-ink/15" />
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-72 bg-linear-to-t from-brand-ink to-transparent" />
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-brand-ink to-transparent" />
 
       <div
         className="container-mk relative grid items-start gap-10 will-change-transform md:grid-cols-[minmax(0,1fr)_auto]"
