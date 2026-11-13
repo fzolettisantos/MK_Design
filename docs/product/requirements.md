@@ -59,3 +59,12 @@ Assistência autorizada, reparo de qualquer defeito, garantia, peças, visita gr
 - [ ] Marca **IOC × AOC**
 - [ ] Fotos reais de trabalhos e dados institucionais
 - [ ] Domínio, hospedagem e escolha do backend
+
+## 8. Status do agendamento (nov/2026)
+Implementado em modo demonstrativo: wizard de 5 etapas em `/agendamento` (serviço, detalhes, local, data/período desejados, dados e revisão), validação Zod no cliente e no servidor (`src/lib/booking/schema.ts`), action `submitBooking`, protocolo `MK-AAMMDD-XXXXX`, mensagem do WhatsApp no modelo do guia.
+Limitações conhecidas (resolver com backend):
+- Pedido gravado só em memória (`src/lib/repositories/memory`): não é durável nem impede dupla reserva. Trocar por Postgres/Supabase.
+- Sem horários reais: o cliente informa data (a partir de amanhã, até 90 dias) e período. Antecedência e janela são provisórias.
+- Sem rate limit/anti-spam, upload de fotos e validação de área atendida (`serviceAreas` vazio).
+- Link do WhatsApp só existe com `NEXT_PUBLIC_WHATSAPP_NUMBER`; sem ele a tela oferece copiar a mensagem.
+- `/privacidade` ainda é página provisória, mas o aceite já aponta para ela.
