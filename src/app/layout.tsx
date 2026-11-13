@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/space-grotesk";
 import "./globals.css";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { siteConfig } from "@/config/site";
 import { colors } from "@/design-system/tokens";
 
@@ -24,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
-        <div id="conteudo">{children}</div>
+        <SiteHeader />
+        <main id="conteudo">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
