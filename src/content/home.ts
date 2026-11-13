@@ -63,17 +63,6 @@ export const howItWorks = {
   ],
 } as const;
 
-export const benefits = {
-  title: "Atendimento simples, desde o primeiro contato.",
-  emphasis: "simples",
-  items: [
-    { icon: "choose", title: "Escolha fácil do serviço" },
-    { icon: "calendar", title: "Agendamento organizado" },
-    { icon: "whatsapp", title: "Contato direto pelo WhatsApp" },
-    { icon: "info", title: "Informações claras antes do atendimento" },
-  ],
-} as const;
-
 export const payments = {
   title: "Pague do jeito que preferir.",
   emphasis: "do jeito que preferir",
