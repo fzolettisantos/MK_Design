@@ -10,7 +10,7 @@ import { finalCta, hero } from "@/content/home";
 
 /**
  * Seção final com foto de fundo e borda superior reta. Ao entrar na tela (`--p` de 0 a 1):
- * o conteúdo desce de baixo da borda até a posição final (e ganha opacidade) e a foto faz parallax
+ * o conteúdo desce de baixo da borda até a posição final e a foto faz parallax
  * (sobe devagar e reduz o zoom). Camada de preto semitransparente sobre a foto (legibilidade) e degradê na base → preto (emenda com o rodapé escuro).
  */
 export function FinalCta() {
@@ -37,10 +37,7 @@ export function FinalCta() {
 
       <div
         className="container-mk relative grid items-start gap-10 will-change-transform md:grid-cols-[minmax(0,1fr)_auto]"
-        style={{
-          transform: "translateY(calc((1 - var(--p)) * -90px))",
-          opacity: "calc(0.15 + var(--p) * 0.85)",
-        }}
+        style={{ transform: "translateY(calc((1 - var(--p)) * -90px))" }}
       >
         <div className="flex flex-col gap-6">
           <SectionHeading
