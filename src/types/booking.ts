@@ -22,6 +22,10 @@ export interface Service {
   categoryId: ServiceCategoryId;
   name: string;
   summary: string;
+  /** Texto da página de detalhe. Sem promessas de prazo, garantia ou preço. */
+  description: string;
+  /** Informações que o cliente deve ter à mão ao solicitar (espelham as etapas do wizard). */
+  infoNeeded: string[];
   durationMinutes: number | null; // definido no painel; null = ainda não configurado
   priceMode: "sob_orcamento"; // não inventar preços
   active: boolean;
