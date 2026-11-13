@@ -75,14 +75,14 @@
   /* Pausa via botão (WCAG 2.2.2) ou ao passar o mouse sobre as figuras */
   [data-paused="true"] .mk-marquee,
   .mk-marquee-hover:hover .mk-marquee { animation-play-state: paused; }
-  /* Seções empilhadas com topo arredondado (cada uma sobrepõe a anterior) */
+  /* Seções empilhadas com topo arredondado (1.5rem); cada uma sobrepõe a anterior */
   .mk-stack {
     position: relative;
     margin-top: -2.5rem;
-    border-top-left-radius: 2.5rem;
-    border-top-right-radius: 2.5rem;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
   }
   @media (min-width: 768px) {
-    .mk-stack { margin-top: -3.5rem; border-top-left-radius: 3.5rem; border-top-right-radius: 3.5rem; }
+    .mk-stack { margin-top: -3.5rem; }
   }
 }
