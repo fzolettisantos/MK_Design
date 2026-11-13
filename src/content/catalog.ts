@@ -8,7 +8,7 @@ import type { Service, ServiceCategory } from "@/types";
 export const categories: ServiceCategory[] = [
   { id: "instalacao-tv", name: "Instalação de TVs", order: 1, heroImage: "/images/banners/servico-parede-bg.webp" },
   { id: "instalacao-suporte", name: "Instalação de suportes", order: 2, heroImage: "/images/banners/servico-suporte-fixo-bg.webp" },
-  { id: "assistencia-tecnica", name: "Assistência técnica", order: 3 },
+  { id: "assistencia-tecnica", name: "Assistência técnica", order: 3, heroImage: "/images/banners/servico-conserto-bg.webp" },
 ];
 
 const installInfo = [
@@ -103,6 +103,5 @@ export const services: Service[] = [
     summary: "Solicite o conserto da sua TV. Recebemos pedidos para Samsung, Sony, TCL, LG e Philips, e outras marcas mediante consulta.",
     description: "Solicite o conserto da sua TV. Recebemos solicitações para Samsung, Sony, TCL, LG e Philips, além de outras marcas mediante consulta. A equipe avalia as informações e orienta sobre o orçamento.",
     infoNeeded: repairInfo, durationMinutes: null, priceMode: "sob_orcamento", active: true, order: 10,
-    heroImage: "/images/banners/servico-conserto-bg.webp",
   },
 ];
