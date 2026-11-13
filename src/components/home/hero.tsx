@@ -5,6 +5,7 @@ import { EmphasizedText } from "@/components/shared/emphasized-text";
 import { Button } from "@/components/ui";
 import { routes } from "@/config/routes";
 import { hero, ticker } from "@/content/home";
+import { HeroBlueprint } from "./hero-blueprint";
 import { HeroMarquee } from "./hero-marquee";
 import { MotionToggle } from "./motion-toggle";
 
@@ -38,10 +39,11 @@ export function Hero() {
       data-motion-root
       className="relative overflow-hidden bg-brand-primary pt-[5.25rem] text-brand-ink md:pt-24"
     >
-      <div className="container-mk">
+      <HeroBlueprint />
+      <div className="container-mk relative">
         <Ticker />
       </div>
-      <div className="container-mk flex flex-col items-center gap-5 pt-8 text-center md:pt-10">
+      <div className="container-mk relative flex flex-col items-center gap-5 pt-8 text-center md:pt-10">
         <p className="mk-rise text-sm font-semibold uppercase tracking-widest" style={d(0)}>
           {hero.eyebrow}
         </p>
@@ -71,7 +73,7 @@ export function Hero() {
           <MotionToggle />
         </div>
       </div>
-      <div className="mk-rise mt-2 pb-14 md:mt-4 md:pb-20" style={d(520)}>
+      <div className="mk-rise relative mt-2 pb-14 md:mt-4 md:pb-20" style={d(520)}>
         <HeroMarquee />
       </div>
     </section>

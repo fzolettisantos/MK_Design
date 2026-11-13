@@ -68,12 +68,22 @@
 @keyframes mk-marquee {
   to { transform: translateX(-50%); }
 }
+@keyframes mk-dash {
+  to { stroke-dashoffset: -80; }
+}
+@keyframes mk-spin {
+  to { transform: rotate(360deg); }
+}
 
 @layer utilities {
   .mk-rise { animation: mk-rise 700ms var(--mk-ease) both; animation-delay: var(--d, 0ms); }
   .mk-marquee { animation: mk-marquee var(--mk-marquee-time, 50s) linear infinite; will-change: transform; }
   /* Pausa via botão (WCAG 2.2.2) ou ao passar o mouse sobre as figuras */
+  .mk-dash { animation: mk-dash 7s linear infinite; }
+  .mk-spin { animation: mk-spin 140s linear infinite; }
   [data-paused="true"] .mk-marquee,
+  [data-paused="true"] .mk-dash,
+  [data-paused="true"] .mk-spin,
   .mk-marquee-hover:hover .mk-marquee { animation-play-state: paused; }
   /* Seções empilhadas com topo arredondado (1.5rem); cada uma sobrepõe a anterior */
   .mk-stack {
