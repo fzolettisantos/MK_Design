@@ -71,6 +71,14 @@
 @keyframes mk-dash {
   to { stroke-dashoffset: -80; }
 }
+@keyframes mk-pulse {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -100; }
+}
+@keyframes mk-blink {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
 @keyframes mk-spin {
   to { transform: rotate(360deg); }
 }
@@ -80,10 +88,14 @@
   .mk-marquee { animation: mk-marquee var(--mk-marquee-time, 50s) linear infinite; will-change: transform; }
   /* Pausa via botão (WCAG 2.2.2) ou ao passar o mouse sobre as figuras */
   .mk-dash { animation: mk-dash 7s linear infinite; }
+  .mk-pulse { animation: mk-pulse 6s linear infinite; }
+  .mk-blink { animation: mk-blink 2.4s ease-in-out infinite; }
   .mk-spin { animation: mk-spin 140s linear infinite; }
   [data-paused="true"] .mk-marquee,
   [data-paused="true"] .mk-dash,
   [data-paused="true"] .mk-spin,
+  [data-paused="true"] .mk-pulse,
+  [data-paused="true"] .mk-blink,
   .mk-marquee-hover:hover .mk-marquee { animation-play-state: paused; }
   /* Seções empilhadas com topo arredondado (1.5rem); cada uma sobrepõe a anterior */
   .mk-stack {

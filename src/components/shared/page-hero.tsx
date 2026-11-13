@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { MotionToggle } from "@/components/home/motion-toggle";
+import { CircuitOverlay } from "./circuit-overlay";
 import { SectionHeading } from "./section-heading";
 import { StickyUnder } from "./sticky-under";
 
@@ -18,17 +20,21 @@ interface Props {
 export function PageHero({ id, title, eyebrow, emphasis, image, breadcrumbs, children }: Props) {
   return (
     <StickyUnder>
-    <section aria-labelledby={id} className="relative overflow-hidden bg-brand-ink pb-16 pt-[6.5rem] text-surface md:pb-24 md:pt-32">
+    <section aria-labelledby={id} data-motion-root className="relative overflow-hidden bg-brand-ink pb-16 pt-[6.5rem] text-surface md:pb-24 md:pt-32">
       {image && (
         <>
           <Image src={image} alt="" fill priority sizes="100vw" aria-hidden="true" className="object-cover object-[50%_40%]" />
           <div aria-hidden="true" className="absolute inset-0 bg-brand-ink/70" />
         </>
       )}
+      <CircuitOverlay />
       <div className="container-mk relative flex flex-col gap-6">
         {breadcrumbs}
         <SectionHeading as="h1" tone="dark" id={id} eyebrow={eyebrow} title={title} emphasis={emphasis} />
         {children}
+        <div className="-ml-4 mt-2">
+          <MotionToggle />
+        </div>
       </div>
     </section>
     </StickyUnder>
