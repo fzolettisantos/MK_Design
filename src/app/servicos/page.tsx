@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ServiceCatalog } from "@/components/services/service-catalog";
-import { SectionHeading } from "@/components/shared/section-heading";
+import { PageHero } from "@/components/shared/page-hero";
 import { serviceRepository } from "@/lib/repositories";
 
 export const metadata: Metadata = {
@@ -16,13 +16,16 @@ export default async function ServicesPage() {
   ]);
 
   return (
-    <section aria-labelledby="servicos-title" className="container-mk flex flex-col gap-8 py-12 md:py-16">
-      <SectionHeading as="h1" id="servicos-title" eyebrow="O QUE FAZEMOS" title="Serviços" />
-      <p className="max-w-2xl text-lg text-text-secondary">
-        Da instalação ao reparo, conte com a MK Design. Escolha um serviço para ver os detalhes. Valores sob orçamento,
-        informados na confirmação do atendimento.
-      </p>
-      <ServiceCatalog services={services} categories={categories} />
-    </section>
+    <>
+      <PageHero id="servicos-title" eyebrow="O QUE FAZEMOS" title="Serviços">
+        <p className="max-w-2xl text-lg text-surface/85">
+          Da instalação ao reparo, conte com a MK Design. Escolha um serviço para ver os detalhes. Valores sob
+          orçamento, informados na confirmação do atendimento.
+        </p>
+      </PageHero>
+      <div className="container-mk pb-16 md:pb-24">
+        <ServiceCatalog services={services} categories={categories} />
+      </div>
+    </>
   );
 }

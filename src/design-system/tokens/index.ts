@@ -17,7 +17,7 @@ export const colors = {
   focus: "#2456D3",
 } as const;
 
-export const radii = { input: 8, button: 10, card: 12, modal: 16 } as const;
+export const radii = { input: 12, button: 9999, card: 20, modal: 32 } as const;
 export const spacing = [4, 8, 12, 16, 24, 32, 48, 64, 96] as const;
 export const layout = { container: 1200, gutterMobile: 20, gutterDesktop: 32, tapMin: 44, controlHeight: 48 } as const;
 export const motion = { fast: 150, base: 250 } as const;

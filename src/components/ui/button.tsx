@@ -14,6 +14,9 @@ export const buttonVariants = cva(
         dark: "bg-brand-ink text-surface hover:bg-brand-ink/85",
         outline: "border border-brand-ink bg-transparent text-brand-ink hover:bg-surface-muted",
         ghost: "bg-transparent text-brand-ink hover:bg-surface-muted",
+        // Variantes para fundo escuro (brand-ink)
+        outlineLight: "border border-surface bg-transparent text-surface hover:bg-surface/10",
+        ghostLight: "bg-transparent text-surface hover:bg-surface/10",
       },
       size: { md: "min-h-12", sm: "min-h-11 px-4 text-sm", icon: "size-11 px-0" },
     },

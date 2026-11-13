@@ -30,7 +30,7 @@ export function MobileMenu() {
     <div className="md:hidden">
       <Button
         ref={buttonRef}
-        variant="ghost"
+        variant="ghostLight"
         size="icon"
         aria-expanded={open}
         aria-controls="menu-mobile"
@@ -43,7 +43,7 @@ export function MobileMenu() {
         <nav
           id="menu-mobile"
           aria-label="Menu principal"
-          className="absolute inset-x-0 top-full z-40 h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-border bg-surface"
+          className="absolute inset-x-0 top-full z-40 h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-surface/10 bg-brand-ink text-surface"
         >
           <ul className="container-mk flex flex-col py-4">
             {mainNav.map((item) => (
@@ -51,7 +51,7 @@ export function MobileMenu() {
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-14 items-center border-b border-border font-heading text-xl font-semibold"
+                  className="flex min-h-14 items-center border-b border-surface/15 font-heading text-xl font-semibold"
                 >
                   {item.label}
                 </Link>

@@ -57,10 +57,10 @@
   --mk-gutter-desktop: 32px;
 
   /* Raios */
-  --mk-radius-input: 8px;
-  --mk-radius-button: 10px;
-  --mk-radius-card: 12px;
-  --mk-radius-modal: 16px;
+  --mk-radius-input: 12px;
+  --mk-radius-button: 9999px; /* pílula */
+  --mk-radius-card: 20px;
+  --mk-radius-modal: 32px;
 
   /* Sombra leve — usar só quando necessário */
   --mk-shadow-sm: 0 1px 2px rgb(23 23 23 / 0.06), 0 1px 3px rgb(23 23 23 / 0.08);

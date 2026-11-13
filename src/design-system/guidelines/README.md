@@ -12,7 +12,7 @@ Fonte: `docs/brand/style-guide.md` §3 e §11. Tokens em `../tokens/`.
 Títulos Space Grotesk 600/700; corpo/UI Inter 400/500/600. Escala fluida em `tokens.css`. Mínimo 14 px para informação essencial.
 
 ## Forma e espaço
-Raios: input 8 · botão 10 · card 12 · modal 16. Espaços 4/8/12/16/24/32/48/64/96. Container 1200 px; margens 20 (mobile) / 32 (desktop). Sombra só quando necessário.
+Raios (atualizados na direção visual de nov/2026): input 12 · botão pílula (9999) · card 20 · modal 32. Espaços 4/8/12/16/24/32/48/64/96. Container 1200 px; margens 20 (mobile) / 32 (desktop). Sombra só quando necessário.
 
 ## Interação e acessibilidade
 - Alvos ≥ 44×44 px; controles 48 px.
@@ -26,3 +26,10 @@ Estúdio técnico contemporâneo: preto/branco + detalhes lime, faixas `surface-
 
 ## Logo
 Preservar monograma MK, moldura aberta, lime + preto, DESIGN espaçado. Versões a produzir: horizontal, vertical, monograma/favicon, claro/escuro, SVG fiel.
+
+## Direção visual vigente (nov/2026)
+Referência: posts de assistência de TV — fundo escuro dominante, título pesado com palavras-chave na cor de acento, formas curvas grandes, botões em pílula, selo de seta em quadrado arredondado, TV como protagonista. **Mantém a paleta MK** (lime `#E4F000`, preto `#171717`, branco). Isto sobrepõe os raios do style guide original (§3).
+- Seções alternam `brand-ink` / `surface` / `surface-muted`, unidas por `CurveDivider`.
+- Lime em formas e acentos; **texto sobre lime sempre `brand-ink`**; nada de branco sobre lime. Decorações (arcos, círculos) nunca ficam atrás de texto.
+- Fundo escuro: texto `surface` ou `surface/75+`; botões `outlineLight`/`ghostLight`; logo `mk-design-logo-trim-on-dark.png`.
+- Copy: não replicar promessas de referências (ex.: "garantia") — ver regras de conteúdo.

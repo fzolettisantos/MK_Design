@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { Button } from "@/components/ui";
-import { SectionHeading } from "./section-heading";
+import { PageHero } from "./page-hero";
 import { routes } from "@/config/routes";
 
 /** Página provisória enquanto a rota não é construída. */
 export function ComingSoon({ title }: { title: string }) {
   return (
-    <section className="container-mk flex min-h-[50dvh] flex-col items-start justify-center gap-6 py-16">
-      <SectionHeading as="h1" eyebrow="EM CONSTRUÇÃO" title={title} />
-      <p className="max-w-xl text-text-secondary">Esta página será publicada em breve.</p>
-      <Button asChild variant="outline">
-        <Link href={routes.home}>Voltar ao início</Link>
-      </Button>
-    </section>
+    <>
+      <PageHero id="pagina-title" eyebrow="EM CONSTRUÇÃO" title={title} />
+      <div className="container-mk flex flex-col items-start gap-6 pb-24">
+        <p className="max-w-xl text-lg text-text-secondary">Esta página será publicada em breve.</p>
+        <Button asChild variant="dark">
+          <Link href={routes.home}>Voltar ao início</Link>
+        </Button>
+      </div>
+    </>
   );
 }

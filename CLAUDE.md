@@ -20,6 +20,7 @@ Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind CSS 4 (`@th
 - Mobile-first; alvos ≥ 44 px; foco visível; respeitar `prefers-reduced-motion`; WCAG 2.2 AA.
 - Componentes: reutilizáveis, em `components/ui` (primitivos) ou pasta de domínio; estados default/hover/focus-visible/selected/disabled/loading/error/empty/success.
 - Formulários: `Field` + labels reais + erro associado; seletores com `SelectableCard`.
+- Direção visual vigente (escura, curvas, botões em pílula, mesma paleta): ver `src/design-system/guidelines/README.md`.
 - Não alterar a identidade visual sem necessidade; preservar o logo (monograma MK, moldura aberta, lime + preto).
 
 ## Arquitetura

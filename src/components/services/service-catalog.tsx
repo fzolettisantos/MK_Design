@@ -27,10 +27,10 @@ export function ServiceCatalog({ services, categories }: { services: Service[]; 
             aria-pressed={filter === o.id}
             onClick={() => setFilter(o.id)}
             className={cn(
-              "min-h-11 rounded-button border px-4 font-semibold transition-colors duration-150",
+              "min-h-11 rounded-button border-2 px-5 font-semibold transition-colors duration-150",
               filter === o.id
-                ? "border-brand-ink bg-brand-ink text-surface"
-                : "border-border bg-surface hover:bg-surface-muted",
+                ? "border-brand-ink bg-brand-primary text-brand-ink"
+                : "border-brand-ink bg-surface hover:bg-surface-muted",
             )}
           >
             {o.label}

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Check } from "lucide-react";
 import { ServiceCard } from "@/components/services/service-card";
-import { CategoryIcon } from "@/components/services/category-icon";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
+import { PageHero } from "@/components/shared/page-hero";
 import { WhatsAppCTA } from "@/components/shared/whatsapp-cta";
 import { Alert, Button } from "@/components/ui";
 import { routes } from "@/config/routes";
@@ -43,24 +43,26 @@ export default async function ServicePage({ params }: { params: Params }) {
 
   return (
     <>
-      <article className="container-mk grid gap-10 py-10 md:py-16 lg:grid-cols-[2fr_1fr]">
-        <div className="flex flex-col gap-8">
+      <PageHero
+        id="servico-title"
+        title={service.name}
+        eyebrow={category?.name}
+        breadcrumbs={
           <Breadcrumbs
+            tone="dark"
             items={[
               { label: "Início", href: routes.home },
               { label: "Serviços", href: routes.services },
               { label: service.name },
             ]}
           />
-          <header className="flex flex-col gap-4">
-            <span className="flex items-center gap-3 text-sm font-semibold uppercase tracking-widest text-text-secondary">
-              <CategoryIcon id={service.categoryId} className="size-5" />
-              {category?.name}
-            </span>
-            <h1>{service.name}</h1>
-            <p className="text-lg text-text-secondary">{service.description}</p>
-          </header>
+        }
+      >
+        <p className="max-w-2xl text-lg text-surface/85">{service.description}</p>
+      </PageHero>
 
+      <div className="container-mk grid gap-10 pb-16 lg:grid-cols-[2fr_1fr] md:pb-24">
+        <div className="flex flex-col gap-8">
           <section aria-labelledby="info-title" className="flex flex-col gap-4">
             <h2 id="info-title">Tenha à mão ao solicitar</h2>
             <ul className="flex flex-col gap-3">
@@ -74,7 +76,6 @@ export default async function ServicePage({ params }: { params: Params }) {
               ))}
             </ul>
           </section>
-
           <Alert title="Orçamento e confirmação">
             Ao enviar sua solicitação, a equipe avalia as informações e orienta sobre o orçamento. A solicitação fica
             registrada e depende de confirmação pela MK Design.
@@ -82,19 +83,21 @@ export default async function ServicePage({ params }: { params: Params }) {
         </div>
 
         <aside aria-label="Solicitar este serviço" className="lg:sticky lg:top-28 lg:self-start">
-          <div className="flex flex-col gap-4 rounded-modal border border-border bg-surface-muted p-6">
-            <p className="font-heading text-xl font-semibold">Sob orçamento</p>
-            <p className="text-sm text-text-secondary">Valores informados na confirmação do serviço.</p>
+          <div className="flex flex-col gap-4 rounded-modal bg-brand-ink p-7 text-surface">
+            <p className="font-heading text-2xl font-semibold text-brand-primary">Sob orçamento</p>
+            <p className="text-sm text-surface/80">Valores informados na confirmação do serviço.</p>
             <Button asChild>
               <Link href={bookingHref}>
                 Solicitar este serviço
                 <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
-            <WhatsAppCTA message={`Olá! Gostaria de saber mais sobre: ${service.name}.`}>Tirar dúvidas</WhatsAppCTA>
+            <WhatsAppCTA variant="outlineLight" message={`Olá! Gostaria de saber mais sobre: ${service.name}.`}>
+              Tirar dúvidas
+            </WhatsAppCTA>
           </div>
         </aside>
-      </article>
+      </div>
 
       {related.length > 0 && (
         <section aria-labelledby="rel-title" className="bg-surface-muted py-12 md:py-16">

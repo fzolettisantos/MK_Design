@@ -18,5 +18,6 @@ export const siteConfig = {
     width: 1254,
     height: 1254,
     srcTrim: "/images/logo/mk-design-logo-trim.png",
+    srcOnDark: "/images/logo/mk-design-logo-trim-on-dark.png", // versão para fundos escuros
   },
 } as const;

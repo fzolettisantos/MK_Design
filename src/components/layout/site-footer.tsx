@@ -1,16 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
-import { businessConfig } from "@/config/business";
+import { businessConfig, isDemoMode } from "@/config/business";
 import { mainNav, routes } from "@/config/routes";
+import { siteConfig } from "@/config/site";
 
 export function SiteFooter() {
   return (
     <footer className="bg-brand-ink text-surface">
-      <div className="h-1 bg-brand-primary" aria-hidden="true" />
+      <div className="h-1.5 bg-brand-primary" aria-hidden="true" />
       <div className="container-mk grid gap-10 py-12 md:grid-cols-3">
         <div className="flex flex-col gap-3">
-          <p className="font-heading text-2xl font-bold">
-            MK <span className="text-brand-primary">DESIGN</span>
-          </p>
+          <Image src={siteConfig.logo.srcOnDark} alt="MK Design" width={951} height={862} className="h-16 w-auto self-start" />
           <p className="max-w-xs text-sm text-surface/80">
             Instalação de TVs, suportes e assistência técnica.
           </p>
@@ -39,9 +39,15 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-surface/15">
-        <p className="container-mk py-5 text-sm text-surface/70">
-          © {new Date().getFullYear()} MK Design. Atendimento sujeito à confirmação de disponibilidade.
-        </p>
+        <div className="container-mk flex flex-col gap-1 py-5 text-sm text-surface/70">
+          <p>© {new Date().getFullYear()} MK Design. Atendimento sujeito à confirmação de disponibilidade.</p>
+          {isDemoMode && (
+            <p role="status">
+              Modo demonstrativo: agenda e pedidos ainda não estão conectados a um banco de dados e nenhuma
+              disponibilidade real é exibida.
+            </p>
+          )}
+        </div>
       </div>
     </footer>
   );
