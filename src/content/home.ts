@@ -16,10 +16,15 @@ export const services = {
   eyebrow: "O QUE FAZEMOS",
   title: "Da instalação ao reparo, conte com a MK Design.",
   emphasis: "MK Design",
+  /** Frase do guia (FAQ: orçamento) usada como texto de apoio do cabeçalho. */
+  intro: "Ao enviar sua solicitação, a equipe avalia as informações e orienta sobre o orçamento.",
   cards: [
     {
       icon: "tv",
       title: "Instalação de TVs",
+      emphasis: "Instalação",
+      image: "/images/services/instalacao-de-tvs.webp",
+      imageAlt: "TV de tela grande instalada em painel de madeira, com prateleira e iluminação de LED",
       text: "Na parede, em painéis ou móveis, conforme as características do ambiente.",
       cta: "Ver opções",
       href: routes.services,
@@ -27,6 +32,9 @@ export const services = {
     {
       icon: "support",
       title: "Suportes para TV",
+      emphasis: "Suportes",
+      image: "/images/services/suportes.webp",
+      imageAlt: "Caixa de ferramentas e chave de fenda sobre o móvel da TV",
       text: "Fixos, articulados, de teto e pedestais. Escolha a solução para seu espaço.",
       cta: "Selecionar suporte",
       href: routes.services,
@@ -34,6 +42,9 @@ export const services = {
     {
       icon: "repair",
       title: "Conserto de TVs",
+      emphasis: "Conserto",
+      image: "/images/services/conserto.webp",
+      imageAlt: "Tela de TV com defeito na imagem",
       text: "Conte qual é o problema da sua TV e solicite uma avaliação técnica.",
       cta: "Solicitar avaliação",
       href: routes.services,

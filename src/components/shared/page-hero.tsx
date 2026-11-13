@@ -1,4 +1,5 @@
 import { SectionHeading } from "./section-heading";
+import { StickyUnder } from "./sticky-under";
 
 interface Props {
   id: string;
@@ -13,6 +14,7 @@ interface Props {
 /** Cabeçalho escuro das páginas internas; a próxima seção (`PageBody`) a sobrepõe com topo arredondado. */
 export function PageHero({ id, title, eyebrow, emphasis, breadcrumbs, children }: Props) {
   return (
+    <StickyUnder>
     <section aria-labelledby={id} className="bg-brand-ink pb-16 pt-[6.5rem] text-surface md:pb-24 md:pt-32">
       <div className="container-mk flex flex-col gap-6">
         {breadcrumbs}
@@ -20,6 +22,7 @@ export function PageHero({ id, title, eyebrow, emphasis, breadcrumbs, children }
         {children}
       </div>
     </section>
+    </StickyUnder>
   );
 }
 
