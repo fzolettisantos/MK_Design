@@ -59,3 +59,38 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Animações do hero (CSS puro; desativadas por prefers-reduced-motion acima) ---------- */
+@keyframes mk-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mk-photo-in {
+  from { opacity: 0; transform: translateX(40px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mk-zoom {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.09) translate3d(-1.5%, 1%, 0); }
+}
+@keyframes mk-float {
+  from { transform: translate3d(0, -10px, 0); }
+  to { transform: translate3d(0, 12px, 0); }
+}
+@keyframes mk-glow {
+  from { opacity: 0.15; }
+  to { opacity: 0.5; }
+}
+@keyframes mk-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@layer utilities {
+  .mk-rise { animation: mk-rise 700ms var(--mk-ease) both; animation-delay: var(--d, 0ms); }
+  .mk-photo-in { animation: mk-photo-in 900ms var(--mk-ease) 150ms both; }
+  .mk-zoom { animation: mk-zoom 16s ease-in-out infinite alternate; will-change: transform; }
+  .mk-float { animation: mk-float 7s ease-in-out infinite alternate; }
+  .mk-glow { animation: mk-glow 4s ease-in-out infinite alternate; }
+  .mk-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: mk-draw 1800ms var(--mk-ease) 300ms forwards; }
+}
