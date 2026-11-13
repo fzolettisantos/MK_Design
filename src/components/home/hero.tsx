@@ -44,13 +44,12 @@ export function Hero() {
         <Ticker />
       </div>
       <div className="container-mk relative flex flex-col items-center gap-5 pt-8 text-center md:pt-10">
-        <p className="mk-rise text-sm font-semibold uppercase tracking-widest" style={d(0)}>
+        <p className="text-sm font-semibold uppercase tracking-widest">
           {hero.eyebrow}
         </p>
         <h1
           id="hero-title"
-          className="mk-rise max-w-4xl text-[clamp(2.5rem,1.3rem+5vw,5rem)] leading-[1.02] tracking-[-0.035em]"
-          style={d(80)}
+          className="max-w-4xl text-[clamp(2.5rem,1.3rem+5vw,5rem)] leading-[1.02] tracking-[-0.035em]"
         >
           <EmphasizedText text={hero.title} emphasis={hero.titleEmphasis} />
         </h1>

@@ -26,8 +26,8 @@
 
   /* Tipografia */
   /* Uma só família em todo o site: Outfit */
-  --mk-font-heading: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --mk-font-body: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --mk-font-heading: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --mk-font-body: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
   /* Escala tipográfica fluida (mobile → desktop) — tamanho / line-height */
   --mk-text-h1: clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem); /* 36 → 56 */

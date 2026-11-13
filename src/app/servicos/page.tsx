@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Serviços",
   description:
     "Instalação de TVs em paredes, painéis e móveis, instalação de suportes e solicitação de reparos. Escolha o serviço e agende com a MK Design.",
+  alternates: { canonical: "/servicos" },
 };
 
 export default async function ServicesPage() {

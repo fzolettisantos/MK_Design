@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BookingWizard } from "@/components/booking/booking-wizard";
+import { Suspense } from "react";
+import { BookingClient } from "@/components/booking/booking-client";
 import { PageBody, PageHero } from "@/components/shared/page-hero";
 import { isDemoMode } from "@/config/business";
 import { serviceRepository } from "@/lib/repositories";
@@ -7,11 +8,11 @@ import { serviceRepository } from "@/lib/repositories";
 export const metadata: Metadata = {
   title: "Agendar serviço",
   description: "Escolha o serviço, informe os detalhes e solicite seu atendimento com a MK Design.",
+  alternates: { canonical: "/agendamento" },
 };
 
-export default async function BookingPage({ searchParams }: { searchParams: Promise<{ servico?: string }> }) {
-  const [{ servico }, services, categories] = await Promise.all([
-    searchParams,
+export default async function BookingPage() {
+  const [services, categories] = await Promise.all([
     serviceRepository.list({ onlyActive: true }),
     serviceRepository.listCategories(),
   ]);
@@ -23,8 +24,10 @@ export default async function BookingPage({ searchParams }: { searchParams: Prom
         </p>
       </PageHero>
       <PageBody>
-        <div className="container-mk max-w-3xl ml-0 md:mx-auto">
-          <BookingWizard services={services} categories={categories} initialSlug={servico} demo={isDemoMode} />
+        <div className="container-mk min-h-[60rem] max-w-3xl ml-0 md:mx-auto">
+          <Suspense fallback={<p className="text-text-secondary">Carregando formulário…</p>}>
+            <BookingClient services={services} categories={categories} demo={isDemoMode} />
+          </Suspense>
         </div>
       </PageBody>
     </>

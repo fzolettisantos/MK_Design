@@ -2,9 +2,18 @@
  * Identidade e SEO do site. Nada aqui deve ser inventado: valores desconhecidos ficam `null`
  * até o proprietário confirmar (ver docs/product/requirements.md §Pendências).
  */
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+
+/** URL canônica do site: variável explícita > domínio da Vercel > localhost (dev). Sem barra final. */
+export const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? (vercelHost ? `https://${vercelHost}` : "http://localhost:3000")
+).replace(/\/$/, "");
+
+export const absoluteUrl = (path = "/") => `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
+
 export const siteConfig = {
   name: "MK Design",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? null,
+  url: siteUrl,
   locale: "pt-BR",
   timezone: "America/Sao_Paulo",
   seo: {

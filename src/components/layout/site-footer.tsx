@@ -72,7 +72,7 @@ export async function SiteFooter() {
 
           <div className="mt-14 grid items-start gap-8 md:mt-16 md:grid-cols-[auto_1fr] md:gap-12">
             <div className="flex flex-col gap-3">
-              <Image src={siteConfig.logo.srcTrim} alt="MK Design" width={951} height={862} className="h-16 w-auto self-start" />
+              <Image src={siteConfig.logo.srcTrim} alt="MK Design" width={71} height={64} sizes="71px" className="h-16 w-auto self-start" />
               <p className="max-w-[14rem] text-[0.95rem] text-brand-ink/80">
                 Instalação de TVs, suportes e assistência técnica.
               </p>

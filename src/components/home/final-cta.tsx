@@ -28,6 +28,7 @@ export function FinalCta() {
           src="/images/banners/cta-bg.webp"
           alt=""
           fill
+          quality={60}
           sizes="100vw"
           className="object-cover object-[50%_40%]"
         />

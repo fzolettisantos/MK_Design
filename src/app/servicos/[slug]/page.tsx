@@ -8,6 +8,7 @@ import { PageBody, PageHero } from "@/components/shared/page-hero";
 import { WhatsAppCTA } from "@/components/shared/whatsapp-cta";
 import { Alert, Button } from "@/components/ui";
 import { routes } from "@/config/routes";
+import { breadcrumbLd, JsonLd, serviceLd } from "@/lib/seo/json-ld";
 import { serviceRepository } from "@/lib/repositories";
 
 type Params = Promise<{ slug: string }>;
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title: service.name,
     description: `${service.summary} Solicite seu atendimento com a MK Design.`,
     alternates: { canonical: routes.service(service.slug) },
+    openGraph: { title: service.name, description: `${service.summary} Solicite seu atendimento com a MK Design.`, url: routes.service(service.slug), type: "website" },
   };
 }
 
@@ -43,6 +45,16 @@ export default async function ServicePage({ params }: { params: Params }) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          serviceLd({ name: service.name, description: service.description, category: category?.name ?? "", path: routes.service(service.slug) }),
+          breadcrumbLd([
+            { name: "Início", path: routes.home },
+            { name: "Serviços", path: routes.services },
+            { name: service.name, path: routes.service(service.slug) },
+          ]),
+        ]}
+      />
       <PageHero
         id="servico-title"
         image={service.heroImage ?? category?.heroImage}

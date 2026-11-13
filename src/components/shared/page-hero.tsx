@@ -23,7 +23,7 @@ export function PageHero({ id, title, eyebrow, emphasis, image, breadcrumbs, chi
     <section aria-labelledby={id} data-motion-root className="relative overflow-hidden bg-brand-ink pb-16 pt-[6.5rem] text-surface md:pb-24 md:pt-32">
       {image && (
         <>
-          <Image src={image} alt="" fill priority sizes="100vw" aria-hidden="true" className="object-cover object-[50%_40%]" />
+          <Image src={image} alt="" fill priority quality={50} sizes="100vw" aria-hidden="true" className="object-cover object-[50%_40%]" />
           <div aria-hidden="true" className="absolute inset-0 bg-brand-ink/70" />
         </>
       )}
