@@ -9,18 +9,26 @@
 - Toda a comunicação com o cliente é por WhatsApp (cliente → técnico e técnico → cliente). O site é opcional para acompanhar.
 
 ## Onde as garantias vivem
-Em `supabase/migrations/0001_agendamento.sql`, no banco: restrição de exclusão (`no_overlap`) impede dois atendimentos sobrepostos mesmo com cliques simultâneos; antecedência/janela/grade validadas nas funções; expiração materializada por `expire_stale`; RLS ligado **sem políticas** e `EXECUTE` revogado de `public/anon/authenticated`: o navegador não alcança nada, só o servidor (service_role).
+Em `supabase/migrations/0001_agendamento.sql`, no banco: restrição de exclusão (`no_overlap`) impede dois atendimentos sobrepostos mesmo com cliques simultâneos; antecedência/janela/grade validadas nas funções; expiração materializada por `expire_stale`; RLS ligado **sem políticas** e permissões revogadas de `public/anon/authenticated/service_role` no schema: nenhuma API do Supabase alcança os dados, só o servidor pela conexão direta.
 Testes (`tests/scheduling-db.test.ts`, `tests/availability.test.ts`) rodam a migração real num Postgres (PGlite) com relógio controlado e conferem que o motor de horários livres concorda com o banco.
 
 ## Como configurar (uma vez)
-1. Criar um projeto em supabase.com (região mais próxima, ex. São Paulo).
-2. **SQL Editor** → colar `supabase/migrations/0001_agendamento.sql` → Run.
-3. **Settings → API**: copiar `Project URL` e a chave `service_role`.
-4. Na Vercel → Settings → Environment Variables (Production/Preview): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (e `NEXT_PUBLIC_WHATSAPP_NUMBER`). Fazer redeploy.
-Nunca colar a `service_role` em chat, commit ou código.
+O agendamento vive no schema próprio `mk_agendamento` e é acessado por conexão direta ao Postgres (`DATABASE_URL`). Por isso:
+- serve para **qualquer Postgres**: um projeto Supabase que você já tenha (sem criar outro), Neon (plano gratuito) etc.;
+- é seguro rodar num projeto existente: não toca no schema `public` nem em permissões de outros apps (há teste para isso). Para remover: `drop schema mk_agendamento cascade;`
+- não depende de APIs públicas do Supabase: o navegador não tem caminho até os dados.
+
+Passos:
+1. Escolher o projeto/banco. No Supabase: **SQL Editor** → colar `supabase/migrations/0001_agendamento.sql` → Run.
+2. Copiar a string de conexão (Supabase: Project Settings → Database → Connection string → **Transaction pooler**, porta 6543).
+3. Na Vercel → Settings → Environment Variables: `DATABASE_URL` (e `NEXT_PUBLIC_WHATSAPP_NUMBER`). Redeploy.
+Nunca colar a string de conexão (tem a senha) em chat, commit ou código.
+
+### Atenção ao plano gratuito do Supabase
+Projetos gratuitos **pausam após ~7 dias sem atividade**. Num sistema de agendamento isso significaria o site sem agenda. Mitigações: um ping diário (Vercel Cron) que faça uma consulta simples, ou plano pago quando o negócio justificar. Neon gratuito não pausa permanentemente (acorda sozinho na primeira consulta, com ~1 s de atraso).
 
 ## Reaproveitar em outros sites
-O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availability.ts` e `src/lib/scheduling/*`. Para um novo site, copiar esses três, criar um projeto Supabase novo e ajustar `business_settings`. Uma API central multi-cliente só vale quando houver vários sites (exigiria `tenant_id` e revisão de LGPD).
+O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availability.ts` e `src/lib/scheduling/*`. Para um novo site, copiar esses três, rodar a migração em qualquer Postgres e ajustar `business_settings`. Uma API central multi-cliente só vale quando houver vários sites (exigiria `tenant_id` e revisão de LGPD).
 
 ## Próximas etapas
 1. Ligar o calendário e o formulário do cliente a `getAvailability`/`holdSlot`/`finalizeHold` (hoje o site usa o protótipo e o repositório em memória).

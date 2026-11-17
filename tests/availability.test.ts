@@ -42,18 +42,19 @@ describe("paridade com o banco: o que o motor mostra como livre o banco aceita, 
   it("amostra de reservas e todos os horários de um dia", async () => {
     const db = new PGlite();
     await db.exec(readFileSync("supabase/migrations/0001_agendamento.sql", "utf8"));
+    await db.exec("set search_path to mk_agendamento, public");
     for (const [h, tok] of [[9, "a"], [14, "b"], [15 + 2, "c"]] as const) {
-      const r = await db.query<{ r: { ok: boolean } }>(`select public.hold_slot($1,'s','instalacao',$2,$3) as r`, [
+      const r = await db.query<{ r: { ok: boolean } }>(`select mk_agendamento.hold_slot($1,'s','instalacao',$2,$3) as r`, [
         new Date(`2026-11-19T${String(h).padStart(2, "0")}:00:00-03:00`).toISOString(), tok, NOW.toISOString(),
       ]);
       expect(r.rows[0]!.r.ok).toBe(true);
     }
     const q = await db.query<{ start_at: string; core_end_at: string; end_at: string }>(
-      `select * from public.get_busy($1,$2,$3)`, ["2026-11-19T03:00:00Z", "2026-11-20T03:00:00Z", NOW.toISOString()]);
+      `select * from mk_agendamento.get_busy($1,$2,$3)`, ["2026-11-19T03:00:00Z", "2026-11-20T03:00:00Z", NOW.toISOString()]);
     const busy: Busy[] = q.rows.map((r) => ({ start: new Date(r.start_at), coreEnd: new Date(r.core_end_at), end: new Date(r.end_at) }));
     const day = generateAvailability(NOW, busy).find((d) => d.key === "2026-11-19")!;
     for (const slot of day.slots) {
-      const r = await db.query<{ r: { ok: boolean; reason?: string } }>(`select public.hold_slot($1,'s','instalacao','t',$2) as r`, [slot.start, NOW.toISOString()]);
+      const r = await db.query<{ r: { ok: boolean; reason?: string } }>(`select mk_agendamento.hold_slot($1,'s','instalacao','t',$2) as r`, [slot.start, NOW.toISOString()]);
       const accepted = r.rows[0]!.r.ok;
       expect(accepted, `hora ${slot.hour} (${slot.state})`).toBe(slot.state === "livre");
       if (accepted) await db.query(`delete from bookings where hold_token='t'`);

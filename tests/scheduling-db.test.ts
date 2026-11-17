@@ -13,12 +13,13 @@ let db: PGlite;
 beforeEach(async () => {
   db = new PGlite();
   await db.exec(SQL);
+  await db.exec("set search_path to mk_agendamento, public");
 });
 
 const call = async (fn: string, ...args: (string | number | null | object)[]) => {
   const ph = args.map((_, i) => `$${i + 1}`).join(", ");
   const params = args.map((a) => (a !== null && typeof a === "object" ? JSON.stringify(a) : a));
-  const r = await db.query<{ r: Record<string, unknown> }>(`select public.${fn}(${ph}) as r`, params);
+  const r = await db.query<{ r: Record<string, unknown> }>(`select mk_agendamento.${fn}(${ph}) as r`, params);
   return r.rows[0]!.r as { ok: boolean; reason?: string; id?: string; protocol?: string; status?: string };
 };
 const hold = (start: string, token = "t1", now = NOW) =>
@@ -93,7 +94,7 @@ describe("expiração libera o horário", () => {
   it("get_busy não mostra reservas vencidas nem dados pessoais", async () => {
     const h = await hold(T(14), "a");
     await call("finalize_hold", h.id!, "a", person, at(NOW));
-    const q = (now: string) => db.query(`select * from public.get_busy($1,$2,$3)`, [T(0), T(23, 20), at(now)]);
+    const q = (now: string) => db.query(`select * from mk_agendamento.get_busy($1,$2,$3)`, [T(0), T(23, 20), at(now)]);
     const busy = await q(NOW);
     expect(busy.rows).toHaveLength(1);
     expect(Object.keys(busy.rows[0]!).sort()).toEqual(["core_end_at", "end_at", "start_at"]);
@@ -141,7 +142,7 @@ describe("convite do técnico (conserto com retirada)", () => {
   }
   it("avaliação não ocupa agenda", async () => {
     await request();
-    expect((await db.query(`select * from public.get_busy($1,$2,$3)`, [T(0), T(23, 20), at(NOW)])).rows).toHaveLength(0);
+    expect((await db.query(`select * from mk_agendamento.get_busy($1,$2,$3)`, [T(0), T(23, 20), at(NOW)])).rows).toHaveLength(0);
   });
   it("convite válido: cliente reserva o horário e o convite é consumido (uso único)", async () => {
     const id = await request();
@@ -187,5 +188,21 @@ describe("convite do técnico (conserto com retirada)", () => {
     const r = await call("get_invite", "hash1", at(NOW));
     expect(JSON.stringify(r)).not.toContain("13912345678");
     expect((r as { first_name?: string }).first_name).toBe("Maria");
+  });
+});
+
+describe("isolamento: seguro para um projeto que já tem outros apps", () => {
+  it("não cria, altera nem remove nada fora do schema mk_agendamento", async () => {
+    const other = new PGlite();
+    await other.exec(`create table public.bookings (id int primary key, dado text); insert into public.bookings values (1, 'do outro app');
+                      create table public.invites (id int); create function public.hold_slot() returns int language sql as 'select 42';`);
+    const before = await other.query(`select table_name from information_schema.tables where table_schema='public' order by 1`);
+    await other.exec(SQL);
+    const after = await other.query(`select table_name from information_schema.tables where table_schema='public' order by 1`);
+    expect(after.rows).toEqual(before.rows);
+    expect((await other.query(`select dado from public.bookings`)).rows).toEqual([{ dado: "do outro app" }]);
+    expect((await other.query(`select public.hold_slot() as v`)).rows).toEqual([{ v: 42 }]);
+    const fns = await other.query<{ n: string }>(`select count(*)::text as n from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname <> 'hold_slot'`);
+    expect(fns.rows[0]!.n).toBe("0");
   });
 });

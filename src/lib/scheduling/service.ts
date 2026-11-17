@@ -1,35 +1,38 @@
 import "server-only";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import postgres from "postgres";
 import { generateAvailability, type Busy, type DayAvailability } from "@/lib/booking/availability";
 import { hashToken, isTokenShape, newToken } from "./tokens";
 
 /**
- * Acesso ao agendamento no Supabase. Roda SOMENTE no servidor, com a service_role (nunca vai ao navegador).
- * Toda regra importante (sobreposição, antecedência, expiração, uso único) está no banco: aqui só chamamos as funções.
+ * Acesso ao agendamento por conexão DIRETA ao Postgres (Supabase, Neon ou qualquer outro), SOMENTE no servidor.
+ * Sem APIs públicas no meio: o navegador não tem como alcançar o banco. Toda regra importante (sobreposição,
+ * antecedência, expiração, uso único) está nas funções do schema `mk_agendamento`; aqui só as chamamos.
  */
 export class SchedulingUnavailableError extends Error {
   constructor() {
-    super("Agendamento indisponível: Supabase não configurado.");
+    super("Agendamento indisponível: DATABASE_URL não configurada.");
   }
 }
 
-let client: SupabaseClient | null = null;
-function db(): SupabaseClient {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new SchedulingUnavailableError();
-  client ??= createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-  return client;
+let conn: postgres.Sql | null = null;
+function sql(): postgres.Sql {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new SchedulingUnavailableError();
+  // max 1 + prepare:false = compatível com o pooler em modo transação (serverless/Vercel).
+  conn ??= postgres(url, { max: 1, prepare: false, ssl: "require", idle_timeout: 20, connect_timeout: 10 });
+  return conn;
 }
 
-export const isSchedulingConfigured = () =>
-  Boolean((process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL) && process.env.SUPABASE_SERVICE_ROLE_KEY);
+export const isSchedulingConfigured = () => Boolean(process.env.DATABASE_URL);
 
 type Rpc = { ok: boolean; reason?: string } & Record<string, unknown>;
-async function rpc(fn: string, args: Record<string, unknown>): Promise<Rpc> {
-  const { data, error } = await db().rpc(fn, args);
-  if (error) throw new Error(`Falha ao chamar ${fn}`); // sem expor detalhes nem dados pessoais
-  return data as Rpc;
+async function rpc(query: Promise<postgres.RowList<postgres.Row[]>>): Promise<Rpc> {
+  try {
+    const rows = await query;
+    return rows[0]?.r as Rpc;
+  } catch {
+    throw new Error("Falha ao acessar a agenda"); // sem expor detalhes nem dados pessoais
+  }
 }
 
 export type BookingKind = "instalacao" | "retirada";
@@ -43,45 +46,49 @@ export interface CustomerData {
 /** Horários livres dos próximos 30 dias, calculados a partir dos intervalos ocupados (sem dados pessoais). */
 export async function getAvailability(now = new Date()): Promise<DayAvailability[]> {
   const to = new Date(now.getTime() + 32 * 24 * 3_600_000);
-  const { data, error } = await db().rpc("get_busy", { p_from: now.toISOString(), p_to: to.toISOString(), p_now: now.toISOString() });
-  if (error) throw new Error("Falha ao consultar a agenda");
-  const busy: Busy[] = (data as { start_at: string; core_end_at: string; end_at: string }[]).map((r) => ({
-    start: new Date(r.start_at), coreEnd: new Date(r.core_end_at), end: new Date(r.end_at),
-  }));
+  let rows: postgres.RowList<postgres.Row[]>;
+  try {
+    rows = await sql()`select start_at, core_end_at, end_at from mk_agendamento.get_busy(${now}, ${to}, ${now})`;
+  } catch {
+    throw new Error("Falha ao consultar a agenda");
+  }
+  const busy: Busy[] = rows.map((r) => ({ start: new Date(r.start_at), coreEnd: new Date(r.core_end_at), end: new Date(r.end_at) }));
   return generateAvailability(now, busy);
 }
 
 /** Reserva o horário por 10 min. O `holdToken` fica com o navegador de quem reservou. */
-export async function holdSlot(startIso: string, serviceSlug: string, kind: BookingKind) {
+export async function holdSlot(start: Date, serviceSlug: string, kind: BookingKind) {
   const holdToken = newToken();
-  const r = await rpc("hold_slot", { p_start: startIso, p_service_slug: serviceSlug, p_kind: kind, p_token: holdToken });
+  const r = await rpc(sql()`select mk_agendamento.hold_slot(${start}, ${serviceSlug}, ${kind}, ${holdToken}) as r`);
   return r.ok ? { ok: true as const, id: r.id as string, protocol: r.protocol as string, expiresAt: r.expires_at as string, holdToken } : r;
 }
 
-export const releaseHold = (id: string, holdToken: string) => rpc("release_hold", { p_id: id, p_token: holdToken });
+export const releaseHold = (id: string, holdToken: string) =>
+  rpc(sql()`select mk_agendamento.release_hold(${id}::uuid, ${holdToken}) as r`);
+
 export const finalizeHold = (id: string, holdToken: string, data: CustomerData) =>
-  rpc("finalize_hold", { p_id: id, p_token: holdToken, p_data: data });
+  rpc(sql()`select mk_agendamento.finalize_hold(${id}::uuid, ${holdToken}, ${sql().json(data as never)}) as r`);
 
 /** Conserto/avaliação: registra o pedido SEM ocupar agenda; o técnico decide se manda o convite. */
 export const createEvaluationRequest = (serviceSlug: string, data: CustomerData) =>
-  rpc("create_evaluation_request", { p_service_slug: serviceSlug, p_data: data });
+  rpc(sql()`select mk_agendamento.create_evaluation_request(${serviceSlug}, ${sql().json(data as never)}) as r`);
 
 /** Técnico gera o convite individual. Devolve o token UMA vez, para montar o link; o banco guarda só o hash. */
 export async function createInvite(requestId: string) {
   const token = newToken();
-  const r = await rpc("create_invite", { p_request_id: requestId, p_token_hash: hashToken(token) });
+  const r = await rpc(sql()`select mk_agendamento.create_invite(${requestId}::uuid, ${hashToken(token)}) as r`);
   return r.ok ? { ok: true as const, token, expiresAt: r.expires_at as string } : r;
 }
 
 export async function getInvite(token: string) {
   if (!isTokenShape(token)) return { ok: false as const, reason: "convite_invalido" };
-  return rpc("get_invite", { p_token_hash: hashToken(token) });
+  return rpc(sql()`select mk_agendamento.get_invite(${hashToken(token)}) as r`);
 }
 
-export async function claimInviteSlot(token: string, startIso: string) {
+export async function claimInviteSlot(token: string, start: Date) {
   if (!isTokenShape(token)) return { ok: false as const, reason: "convite_invalido" };
-  return rpc("claim_invite_slot", { p_token_hash: hashToken(token), p_start: startIso });
+  return rpc(sql()`select mk_agendamento.claim_invite_slot(${hashToken(token)}, ${start}) as r`);
 }
 
 export const technicianDecide = (id: string, decision: "confirmar" | "recusar") =>
-  rpc("technician_decide", { p_id: id, p_decision: decision });
+  rpc(sql()`select mk_agendamento.technician_decide(${id}::uuid, ${decision}) as r`);
