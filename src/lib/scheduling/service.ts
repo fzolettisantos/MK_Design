@@ -92,3 +92,19 @@ export async function claimInviteSlot(token: string, start: Date) {
 
 export const technicianDecide = (id: string, decision: "confirmar" | "recusar") =>
   rpc(sql()`select mk_agendamento.technician_decide(${id}::uuid, ${decision}) as r`);
+
+/** Verificação para o dono confirmar a configuração. Não devolve dados, só o estado. */
+export async function schedulingHealth(): Promise<{ configurado: boolean; conectado: boolean; migracao: boolean }> {
+  if (!isSchedulingConfigured()) return { configurado: false, conectado: false, migracao: false };
+  try {
+    await sql()`select 1`;
+  } catch {
+    return { configurado: true, conectado: false, migracao: false };
+  }
+  try {
+    const r = await sql()`select count(*)::int as n from mk_agendamento.business_settings`;
+    return { configurado: true, conectado: true, migracao: (r[0]?.n ?? 0) === 1 };
+  } catch {
+    return { configurado: true, conectado: true, migracao: false };
+  }
+}
