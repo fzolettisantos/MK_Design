@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { NotificationsPanel } from "@/components/admin/notifications-panel";
 import { TechnicianBoard } from "@/components/admin/technician-board";
 import { PageBody, PageHero } from "@/components/shared/page-hero";
 import { Alert } from "@/components/ui";
 import { requireTech } from "@/lib/admin/session";
+import { isPushConfigured } from "@/lib/notify/push";
 import { serviceRepository } from "@/lib/repositories";
 import { isSchedulingConfigured, listForTechnician } from "@/lib/scheduling/service";
 
@@ -20,7 +22,8 @@ export default async function AdminPage() {
     <>
       <PageHero id="painel-title" eyebrow="ÁREA DO TÉCNICO" title="Painel do técnico" />
       <PageBody>
-        <div className="container-mk min-h-[30rem]">
+        <div className="container-mk flex min-h-[30rem] flex-col gap-6">
+          {data && <NotificationsPanel configured={isPushConfigured()} publicKey={process.env.VAPID_PUBLIC_KEY ?? null} />}
           {data ? (
             <TechnicianBoard data={data} services={services} />
           ) : (

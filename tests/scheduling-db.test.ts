@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { beforeEach, describe, expect, it } from "vitest";
 
 /** Roda a migração REAL num Postgres (PGlite) e testa as garantias do banco com relógio controlado. */
-const SQL = readFileSync("supabase/migrations/0001_agendamento.sql", "utf8") + "\n" + readFileSync("supabase/migrations/0002_convite_reagendamento.sql", "utf8");
+const SQL = readFileSync("supabase/migrations/0001_agendamento.sql", "utf8") + "\n" + readFileSync("supabase/migrations/0002_convite_reagendamento.sql", "utf8") + "\n" + readFileSync("supabase/migrations/0003_recusa_retencao_push.sql", "utf8");
 const NOW = "2026-11-17T12:00:00-03:00"; // terça, 12:00 em Brasília
 const at = (iso: string) => new Date(iso).toISOString();
 // Horários válidos (grade de 1h, >24h de antecedência, <30 dias): dia 19/11 em Brasília.
@@ -222,6 +222,58 @@ describe("convite de reagendamento (depois de cancelar)", () => {
     expect((await call("create_invite", h.id!, "x", at(NOW))).reason).toBe("pedido_invalido"); // ainda aguardando confirmação
     await call("technician_decide", h.id!, "confirmar", at(NOW));
     expect((await call("create_invite", h.id!, "x", at(NOW))).reason).toBe("pedido_invalido"); // confirmado
+  });
+});
+
+describe("recusado também recebe convite de reagendamento", () => {
+  it("recusar libera o horário e o cliente pode escolher outro pelo link", async () => {
+    const h = await hold(T(14), "a");
+    await call("finalize_hold", h.id!, "a", person, at(NOW));
+    expect((await call("technician_decide", h.id!, "recusar", at(NOW))).status).toBe("recusado");
+    expect((await call("create_invite", h.id!, "rec1", at(NOW))).ok).toBe(true);
+    const r = await call("claim_invite_slot", "rec1", T(18, 22), at("2026-11-17T13:00:00-03:00"));
+    expect(r.ok).toBe(true);
+  });
+});
+
+describe("retenção de dados (LGPD)", () => {
+  it("apaga pedidos além de 12 meses, com convites e histórico, e mantém os recentes", async () => {
+    const old = await hold(T(14), "velho");
+    await call("finalize_hold", old.id!, "velho", person, at(NOW));
+    const recent = await hold(T(18), "novo");
+    await call("finalize_hold", recent.id!, "novo", person, at(NOW));
+    await db.query(`update bookings set end_at = $1, start_at = $2 where id = $3`, ["2025-10-01T15:00:00Z", "2025-10-01T14:00:00Z", old.id]);
+    const ev = await call("create_evaluation_request", "solicitar-conserto-de-tv", person, at("2025-09-01T12:00:00-03:00"));
+    await call("create_invite", ev.id!, "h-old", at("2025-09-01T12:00:00-03:00"));
+    const r = (await db.query<{ r: { apagados: number } }>(`select mk_agendamento.purge_old($1) as r`, [at("2026-11-17T12:00:00-03:00")])).rows[0]!.r;
+    expect(r.apagados).toBe(2); // atendimento antigo + avaliação antiga
+    const left = await db.query<{ id: string }>(`select id from bookings`);
+    expect(left.rows.map((x) => x.id)).toEqual([recent.id]);
+    expect((await db.query(`select 1 from invites`)).rows).toHaveLength(0);
+    expect((await db.query(`select 1 from booking_status_history where booking_id = $1`, [old.id])).rows).toHaveLength(0);
+  });
+  it("o prazo vem da configuração (retention_months)", async () => {
+    const h = await hold(T(14), "a");
+    await call("finalize_hold", h.id!, "a", person, at(NOW));
+    await db.query(`update bookings set start_at = $1, end_at = $2 where id = $3`, ["2026-03-01T14:00:00Z", "2026-03-01T15:30:00Z", h.id]);
+    await db.query(`update business_settings set retention_months = 12`);
+    expect(((await db.query<{ r: { apagados: number } }>(`select mk_agendamento.purge_old($1) as r`, [at(NOW)])).rows[0]!.r.apagados)).toBe(0);
+    await db.query(`update business_settings set retention_months = 6`);
+    expect(((await db.query<{ r: { apagados: number } }>(`select mk_agendamento.purge_old($1) as r`, [at(NOW)])).rows[0]!.r.apagados)).toBe(1);
+  });
+  it("remove reservas temporárias abandonadas (sem dados pessoais) com mais de 1 dia", async () => {
+    await hold(T(14), "abandonada");
+    await db.query(`update bookings set status = 'expirado', created_at = $1`, ["2026-11-15T12:00:00Z"]);
+    const r = (await db.query<{ r: { reservas_abandonadas: number } }>(`select mk_agendamento.purge_old($1) as r`, [at(NOW)])).rows[0]!.r;
+    expect(r.reservas_abandonadas).toBe(1);
+  });
+});
+
+describe("assinaturas de push", () => {
+  it("guarda e atualiza por endpoint, sem acesso para anon/authenticated", async () => {
+    await db.query(`insert into push_subscriptions (endpoint, p256dh, auth) values ('e1','k','a') on conflict (endpoint) do update set p256dh = excluded.p256dh`);
+    await db.query(`insert into push_subscriptions (endpoint, p256dh, auth) values ('e1','k2','a') on conflict (endpoint) do update set p256dh = excluded.p256dh`);
+    expect((await db.query<{ p256dh: string }>(`select p256dh from push_subscriptions`)).rows).toEqual([{ p256dh: "k2" }]);
   });
 });
 

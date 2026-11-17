@@ -214,8 +214,8 @@ function HandledCard({ h, service, copied, onCopy, onDismiss }: {
       <Person b={h.booking} service={service} />
       <p className="font-semibold">Falta avisar {h.booking.name}:</p>
       <pre className="whitespace-pre-wrap break-words rounded-card bg-surface p-3 text-sm text-brand-ink [overflow-wrap:anywhere]">{h.notice.message}</pre>
-      {h.state === "cancelado" && !hasLink && <Alert variant="error">Não foi possível gerar o link de reagendamento. A mensagem pede para combinar outro horário.</Alert>}
-      {h.state === "cancelado" && hasLink && <p className="text-sm font-semibold">A mensagem leva um link individual (48 h) para o cliente escolher outro dia e horário.</p>}
+      {(h.state === "cancelado" || h.state === "recusado") && !hasLink && <Alert variant="error">Não foi possível gerar o link de reagendamento. A mensagem pede para combinar outro horário.</Alert>}
+      {(h.state === "cancelado" || h.state === "recusado") && hasLink && <p className="text-sm font-semibold">A mensagem leva um link individual (48 h) para o cliente escolher outro dia e horário.</p>}
       <div className="flex flex-wrap gap-2">
         {h.notice.url ? (
           <Button asChild variant="dark"><a href={h.notice.url} target="_blank" rel="noopener noreferrer"><MessageCircle aria-hidden="true" />Abrir WhatsApp<span className="sr-only"> (abre em nova aba)</span></a></Button>

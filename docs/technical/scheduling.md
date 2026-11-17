@@ -15,6 +15,7 @@ Testes (`tests/scheduling-db.test.ts`, `tests/availability.test.ts`) rodam a mig
 ## Migrações (rodar nesta ordem no SQL Editor; ambas são seguras de repetir)
 1. `0001_agendamento.sql` — tabelas, regras e funções.
 2. `0002_convite_reagendamento.sql` — convite também para **reagendar depois de cancelar** (o cancelamento envia ao cliente um link individual de 48 h para escolher outro dia e hora).
+3. `0003_recusa_retencao_push.sql` — a **recusa** também envia o link de reagendamento; **retenção de dados** (`purge_old`, prazo `retention_months`, padrão 12); tabela das assinaturas de **notificação push**.
 
 ## Como configurar (uma vez)
 O agendamento vive no schema próprio `mk_agendamento` e é acessado por conexão direta ao Postgres (`DATABASE_URL`). Por isso:
@@ -38,12 +39,20 @@ O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availab
 `/admin` (login em `/admin/entrar`). Configuração: variável **`TECH_PASSWORD`** na Vercel (mínimo de 14 caracteres; sem ela o acesso fica desativado). Sessão: cookie `httpOnly`, `sameSite=lax`, restrito a `/admin`, assinado com HMAC e válido por 14 dias; trocar a senha encerra todas as sessões. Tentativas erradas: atraso de 1,2 s e bloqueio de 15 min após 5 falhas (por instância do servidor; a força da senha é a defesa principal). Toda página e ação do painel confere a sessão (`requireTech`/`guardAction`).
 O painel tem 3 abas: **Aguardando sua resposta** (Confirmar/Recusar), **Avaliações de conserto** (enviar link de agendamento, chamar no WhatsApp, resolver por conversa) e **Próximos atendimentos** (cancelar). Depois de cada ação o cartão muda de cor, com ícone e texto: verde = confirmado, vermelho = recusado, amarelo = cancelado. A mensagem pronta para o WhatsApp do cliente fica dentro do cartão até o técnico marcar "Pronto, já avisei"; a de cancelamento leva o link de reagendamento. A lista atualiza sozinha a cada 30 s.
 
+## Avisos de pedido novo no celular (Web Push)
+Quando chega um pedido (reserva, avaliação ou remarcação pelo link) o servidor envia uma notificação ao celular do técnico, depois de responder ao cliente (`after()`), em melhor esforço: se o envio falhar, o pedido do cliente não é afetado. O texto **não leva nome nem telefone**: só o tipo de pedido e o horário. Aparelhos que não existem mais (404/410) são removidos sozinhos.
+Configuração (uma vez): em `/admin`, o cartão "Avisos de pedido novo" tem o botão **Gerar chaves** (só aparece enquanto elas não existem e só para quem está logado). Cadastrar na Vercel como **Secret** `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`, publicar de novo, abrir `/admin` no celular e tocar em **Ativar avisos neste aparelho** (depois, **Enviar aviso de teste**). No **iPhone** é preciso antes "Adicionar à Tela de Início" e abrir o painel pelo ícone; no Android, usar o Chrome.
+Limite: o plano gratuito da Vercel só permite agendador diário, então não há aviso de "convite expirou" ou "pedido vai expirar" no horário exato; o técnico vê isso no painel (atualiza a cada 30 s).
+
+## Retenção de dados (LGPD)
+A política de privacidade (`/privacidade`) promete apagar os dados após **12 meses**. Isso é cumprido por `mk_agendamento.purge_old` (apaga pedidos, convites e histórico além do prazo, e reservas abandonadas), chamada todo dia às 06:00 UTC pela rota `/api/agenda/limpeza` (agendador em `vercel.json`). A rota só responde com `Authorization: Bearer <CRON_SECRET>`: cadastrar **`CRON_SECRET`** (mín. 16 caracteres) na Vercel, que a envia sozinha. Sem ele a limpeza fica desativada.
+
 ## Estado atual (nov/2026)
-Ligado ao banco real: `/agendamento` (instalação com calendário, reserva de 10 min, pedido aguardando técnico; conserto com avaliação ou retirada), `/agendamento/convite/[token]` (convite individual, uso único, 48 h) e o painel do técnico. Sem `DATABASE_URL` o site cai para o modo demonstrativo; `/api/agenda/status` confirma a configuração.
-Verificado de ponta a ponta contra um Postgres local: disputa entre dois clientes pelo mesmo horário, expiração, convite usado/inventado/malformado, consentimento, login, cookie falso, ação sem sessão (negada e sem alterar o pedido), confirmar/recusar/cancelar, acessibilidade.
+Ligado ao banco real: `/agendamento`, `/agendamento/convite/[token]` (avaliação, cancelamento e recusa), painel do técnico, avisos no celular, limpeza agendada e política de privacidade publicada.
+Verificado de ponta a ponta contra um Postgres local e um servidor de push simulado: disputa entre dois clientes, expiração, convites (usado/inventado/malformado), login, cookie falso, ação sem sessão, confirmar/recusar/cancelar com link e remarcação, envio do push e remoção de aparelho morto, limpeza com e sem credencial, service worker exibindo a notificação, acessibilidade.
 
 ## Próximas etapas
-1. Aviso ao técnico quando chega pedido novo (hoje ele vê ao abrir o painel; a lista se atualiza a cada 30 s). Opções: notificação no celular (PWA) ou e-mail.
-2. Antirrobô e limite de pedidos pendentes por telefone.
-3. Deslocamento por distância (hoje fixo em 30 min).
-4. Páginas `/sobre`, `/contato`, `/privacidade` (o aceite já aponta para a privacidade).
+1. Antirrobô e limite de pedidos pendentes por telefone.
+2. Deslocamento por distância (hoje fixo em 30 min).
+3. Páginas `/sobre` e `/contato`.
+4. Revisão jurídica da política de privacidade e inclusão de razão social/CNPJ.

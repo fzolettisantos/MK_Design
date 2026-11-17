@@ -173,3 +173,23 @@ export async function closeEvaluation(id: string): Promise<boolean> {
                          where id = ${id}::uuid and kind = 'avaliacao' and status = 'aguardando_tecnico' returning id`;
   return r.length === 1;
 }
+
+/** Retenção (LGPD): apaga o que passou do prazo configurado (padrão 12 meses). Chamada pela rota agendada. */
+export async function purgeOld() {
+  const r = await rpc(sql()`select mk_agendamento.purge_old() as r`);
+  return { apagados: Number(r.apagados ?? 0), reservasAbandonadas: Number(r.reservas_abandonadas ?? 0) };
+}
+
+// ------------------------------------------------------------------ assinaturas de notificação push
+export interface PushSub { endpoint: string; p256dh: string; auth: string }
+export async function savePushSubscription(sub: PushSub) {
+  await sql()`insert into mk_agendamento.push_subscriptions (endpoint, p256dh, auth) values (${sub.endpoint}, ${sub.p256dh}, ${sub.auth})
+              on conflict (endpoint) do update set p256dh = excluded.p256dh, auth = excluded.auth`;
+}
+export async function removePushSubscription(endpoint: string) {
+  await sql()`delete from mk_agendamento.push_subscriptions where endpoint = ${endpoint}`;
+}
+export async function listPushSubscriptions(): Promise<PushSub[]> {
+  const r = await sql()`select endpoint, p256dh, auth from mk_agendamento.push_subscriptions`;
+  return r.map((x) => ({ endpoint: x.endpoint, p256dh: x.p256dh, auth: x.auth }));
+}

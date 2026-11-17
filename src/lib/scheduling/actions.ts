@@ -1,7 +1,9 @@
 "use server";
 
+import { after } from "next/server";
 import { buildWhatsAppMessage, buildWhatsAppUrl } from "@/config/whatsapp";
-import { fmtSlotParts } from "@/lib/booking/slot-format";
+import { notifyTechnician } from "@/lib/notify/push";
+import { fmtSlotLong, fmtSlotParts } from "@/lib/booking/slot-format";
 import { serviceRepository } from "@/lib/repositories";
 import { customerSchema, detailsLine, kindSchema, toRecord, type Customer } from "./customer";
 import * as db from "./service";
@@ -75,6 +77,8 @@ export async function finalizeBookingAction(input: { id: string; holdToken: stri
     if (!r.ok) return { ok: false as const, reason: String(r.reason ?? "erro") };
     const start = await db.getBookingStart(String(input.id));
     const extra = service.categoryId === "assistencia-tecnica" ? " (retirada da TV para conserto, sem diagnóstico prévio)" : "";
+    // Aviso no celular do técnico, depois de responder ao cliente. Sem nome nem telefone no texto.
+    after(() => notifyTechnician({ title: "Novo pedido de horário", body: `${start ? fmtSlotLong(start) : "Horário a confirmar"} · ${service.name}`, tag: String(r.protocol) }));
     return { ok: true as const, protocol: String(r.protocol), startIso: start, ...whatsapp(c.data, service.name, String(r.protocol), start, extra) };
   });
 }
@@ -87,6 +91,7 @@ export async function createEvaluationAction(input: { serviceSlug: string; custo
   return safe(async () => {
     const r = await db.createEvaluationRequest(service.slug, toRecord(c.data));
     if (!r.ok) return { ok: false as const, reason: String(r.reason ?? "erro") };
+    after(() => notifyTechnician({ title: "Nova avaliação de conserto", body: `${service.name}: um cliente enviou o diagnóstico da TV.`, tag: String(r.protocol) }));
     return { ok: true as const, protocol: String(r.protocol), startIso: null, ...whatsapp(c.data, service.name, String(r.protocol), null) };
   });
 }
@@ -108,6 +113,7 @@ export async function claimInviteAction(input: { token: string; start: string })
       localidade: b ? `${b.neighborhood}/${b.city}` : "—",
       data: when?.date ?? "", hora: when?.time ?? "", nome: b?.name ?? "—",
     });
+    after(() => notifyTechnician({ title: "Cliente escolheu um horário", body: `${startIso ? fmtSlotLong(startIso) : "Horário a confirmar"} · ${svc}`, tag: String(r.protocol) }));
     return { ok: true as const, protocol: String(r.protocol), startIso, message, whatsappUrl: buildWhatsAppUrl(message) };
   });
 }

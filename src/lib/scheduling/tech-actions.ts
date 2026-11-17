@@ -1,8 +1,10 @@
 "use server";
 
+import * as webpush from "web-push";
 import { z } from "zod";
 import { buildWhatsAppUrlTo } from "@/config/whatsapp";
 import { guardAction, login, logout } from "@/lib/admin/session";
+import { isPushConfigured, notifyTechnician } from "@/lib/notify/push";
 import { serviceRepository } from "@/lib/repositories";
 import * as db from "./service";
 import { cancelMessage, confirmMessage, inviteMessage, refuseMessage } from "./tech-messages";
@@ -39,9 +41,10 @@ export async function decideAction(input: { id: string; decision: "confirmar" | 
     const r = await db.technicianDecide(parsed.data, input.decision);
     if (!r.ok) return fail(String(r.reason ?? "erro"));
     const svc = await serviceName(before.serviceSlug);
-    return input.decision === "confirmar"
-      ? notice(before, `Confirmado: avise ${before.name}`, confirmMessage(before, svc))
-      : notice(before, `Recusado: avise ${before.name}`, refuseMessage(before));
+    if (input.decision === "confirmar") return notice(before, `Confirmado: avise ${before.name}`, confirmMessage(before, svc));
+    // Recusa: convite para o cliente escolher outro horário. Se falhar, a recusa vale e a mensagem segue sem o link.
+    const inv = await db.createInvite(parsed.data).catch(() => null);
+    return notice(before, `Recusado: avise ${before.name}`, refuseMessage(before, inv?.ok ? inv.token : undefined));
   } catch {
     return fail("indisponivel");
   }
@@ -88,4 +91,46 @@ export async function cancelAction(input: { id: string }): Promise<Notice | Fail
   } catch {
     return fail("indisponivel");
   }
+}
+
+// ------------------------------------------------------------------ notificações no celular
+const subSchema = z.object({
+  endpoint: z.string().url().startsWith("https://").max(1000),
+  keys: z.object({ p256dh: z.string().min(10).max(300), auth: z.string().min(10).max(100) }),
+});
+
+export async function savePushAction(input: unknown): Promise<{ ok: true } | Fail> {
+  if (!(await guardAction())) return denied;
+  const p = subSchema.safeParse(input);
+  if (!p.success) return fail("dados_invalidos");
+  try {
+    await db.savePushSubscription({ endpoint: p.data.endpoint, p256dh: p.data.keys.p256dh, auth: p.data.keys.auth });
+    return { ok: true };
+  } catch {
+    return fail("indisponivel");
+  }
+}
+
+export async function removePushAction(input: { endpoint: string }): Promise<{ ok: true } | Fail> {
+  if (!(await guardAction())) return denied;
+  try {
+    await db.removePushSubscription(String(input.endpoint));
+    return { ok: true };
+  } catch {
+    return fail("indisponivel");
+  }
+}
+
+export async function testPushAction(): Promise<{ ok: true; sent: number } | Fail> {
+  if (!(await guardAction())) return denied;
+  if (!isPushConfigured()) return fail("nao_configurado");
+  return { ok: true, sent: await notifyTechnician({ title: "Aviso de teste", body: "Os avisos de pedido novo estão funcionando neste celular." }) };
+}
+
+/** Gera as chaves UMA vez, só para quem está logado e só enquanto ainda não existem no servidor. */
+export async function generateVapidAction(): Promise<{ ok: true; publicKey: string; privateKey: string } | Fail> {
+  if (!(await guardAction())) return denied;
+  if (isPushConfigured()) return fail("ja_configurado");
+  const k = webpush.generateVAPIDKeys();
+  return { ok: true, publicKey: k.publicKey, privateKey: k.privateKey };
 }
