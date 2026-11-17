@@ -17,7 +17,7 @@ const initial: Req[] = [
   { id: "4", avaliacao: true, protocolo: "MK-EXEMPLO-D4", cliente: "Cliente Exemplo 4", servico: "Avaliação de TV (sem horário): Samsung, não liga", quando: "Sem horário", local: "Bairro Exemplo, Cidade Exemplo", expira: "—", status: "pendente" },
 ];
 
-const INVITE = "/agendamento/prototipo?convite=EXEMPLO";
+const INVITE = "/agendamento/convite/CODIGO-LONGO-UNICO";
 
 const reply = (r: Req, ok: boolean) =>
   r.avaliacao
@@ -64,7 +64,7 @@ export function TechnicianProto() {
                 <div className="flex flex-col gap-2 rounded-card bg-surface-muted p-4 text-sm" role="status">
                   <p className="flex items-center gap-2 font-semibold"><MessageCircle className="size-4" aria-hidden="true" />Abriria o WhatsApp do cliente com:</p>
                   <p>{reply(r, r.status === "confirmado")}</p>
-                  {r.status === "link" && <p className="text-text-secondary">O link é individual: já leva o serviço (retirada), o endereço e os dados do cliente, e expira sozinho. Ao reservar, o horário aparece aqui para você confirmar. <a className="underline" href={INVITE}>Abrir o link de exemplo</a></p>}
+                  {r.status === "link" && <p className="text-text-secondary">O link é individual: já leva o serviço (retirada), o endereço e os dados do cliente, e expira sozinho. Ao reservar, o horário aparece aqui para você confirmar.</p>}
                   {r.status === "recusado" && <p className="text-text-secondary">O horário volta a ficar livre na hora, e o cliente recebe a sugestão de outros horários.</p>}
                 </div>
               )}

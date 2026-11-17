@@ -30,7 +30,11 @@ Projetos gratuitos **pausam após ~7 dias sem atividade**. Num sistema de agenda
 ## Reaproveitar em outros sites
 O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availability.ts` e `src/lib/scheduling/*`. Para um novo site, copiar esses três, rodar a migração em qualquer Postgres e ajustar `business_settings`. Uma API central multi-cliente só vale quando houver vários sites (exigiria `tenant_id` e revisão de LGPD).
 
+## Estado atual (nov/2026)
+Ligado ao banco real: `/agendamento` (instalação com calendário, reserva de 10 min, pedido aguardando técnico; conserto com avaliação ou retirada) e `/agendamento/convite/[token]` (convite individual, uso único, 48 h). Sem `DATABASE_URL` o site cai para o modo demonstrativo, identificado na tela. `/api/agenda/status` confirma a configuração.
+Verificado de ponta a ponta contra um Postgres local (dois clientes disputando o mesmo horário, expiração, convite usado/inventado/malformado, consentimento, mensagem do WhatsApp). Os horários são buscados no servidor ao chegar ao calendário (a página em si é estática).
+
 ## Próximas etapas
-1. Ligar o calendário e o formulário do cliente a `getAvailability`/`holdSlot`/`finalizeHold` (hoje o site usa o protótipo e o repositório em memória).
-2. Link do convite (`/agendar/convite/[token]`) e página do técnico com login (link no e-mail, `ADMIN_ALLOWED_EMAILS`).
-3. Antirrobô e limite de pedidos pendentes por telefone; aviso ao técnico de pedido novo e de convite sem resposta.
+1. **Painel do técnico com login:** listar pedidos, Confirmar/Recusar (`technician_decide`), gerar convite (`createInvite`) e abrir o WhatsApp do cliente com a resposta pronta. Hoje ainda não existe: sem ele, ninguém confirma os pedidos. `/agendamento/prototipo/tecnico` é só uma maquete.
+2. Antirrobô e limite de pedidos pendentes por telefone; aviso ao técnico de pedido novo e de convite sem resposta.
+3. Deslocamento por distância (hoje fixo em 30 min).

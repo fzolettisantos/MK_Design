@@ -19,7 +19,8 @@ function sql(): postgres.Sql {
   const url = process.env.DATABASE_URL;
   if (!url) throw new SchedulingUnavailableError();
   // max 1 + prepare:false = compatível com o pooler em modo transação (serverless/Vercel).
-  conn ??= postgres(url, { max: 1, prepare: false, ssl: "require", idle_timeout: 20, connect_timeout: 10 });
+  const local = /(localhost|127\.0\.0\.1)/.test(url); // testes locais sem TLS
+  conn ??= postgres(url, { max: 1, prepare: false, ssl: local ? false : "require", idle_timeout: 20, connect_timeout: 10 });
   return conn;
 }
 
@@ -60,7 +61,7 @@ export async function getAvailability(now = new Date()): Promise<DayAvailability
 export async function holdSlot(start: Date, serviceSlug: string, kind: BookingKind) {
   const holdToken = newToken();
   const r = await rpc(sql()`select mk_agendamento.hold_slot(${start}, ${serviceSlug}, ${kind}, ${holdToken}) as r`);
-  return r.ok ? { ok: true as const, id: r.id as string, protocol: r.protocol as string, expiresAt: r.expires_at as string, holdToken } : r;
+  return r.ok ? { ok: true as const, id: r.id as string, protocol: r.protocol as string, expiresAt: r.expires_at as string, holdToken } : { ok: false as const, reason: String(r.reason ?? "erro") };
 }
 
 export const releaseHold = (id: string, holdToken: string) =>
@@ -77,7 +78,7 @@ export const createEvaluationRequest = (serviceSlug: string, data: CustomerData)
 export async function createInvite(requestId: string) {
   const token = newToken();
   const r = await rpc(sql()`select mk_agendamento.create_invite(${requestId}::uuid, ${hashToken(token)}) as r`);
-  return r.ok ? { ok: true as const, token, expiresAt: r.expires_at as string } : r;
+  return r.ok ? { ok: true as const, token, expiresAt: r.expires_at as string } : { ok: false as const, reason: String(r.reason ?? "erro") };
 }
 
 export async function getInvite(token: string) {
@@ -106,5 +107,15 @@ export async function schedulingHealth(): Promise<{ configurado: boolean; conect
     return { configurado: true, conectado: true, migracao: (r[0]?.n ?? 0) === 1 };
   } catch {
     return { configurado: true, conectado: true, migracao: false };
+  }
+}
+
+/** Início do atendimento de um pedido (para montar a mensagem do WhatsApp). */
+export async function getBookingStart(id: string): Promise<string | null> {
+  try {
+    const r = await sql()`select start_at from mk_agendamento.bookings where id = ${id}::uuid`;
+    return r[0]?.start_at ? new Date(r[0].start_at).toISOString() : null;
+  } catch {
+    return null;
   }
 }
