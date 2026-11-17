@@ -30,11 +30,16 @@ Projetos gratuitos **pausam após ~7 dias sem atividade**. Num sistema de agenda
 ## Reaproveitar em outros sites
 O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availability.ts` e `src/lib/scheduling/*`. Para um novo site, copiar esses três, rodar a migração em qualquer Postgres e ajustar `business_settings`. Uma API central multi-cliente só vale quando houver vários sites (exigiria `tenant_id` e revisão de LGPD).
 
+## Painel do técnico (senha única)
+`/admin` (login em `/admin/entrar`). Configuração: variável **`TECH_PASSWORD`** na Vercel (mínimo de 14 caracteres; sem ela o acesso fica desativado). Sessão: cookie `httpOnly`, `sameSite=lax`, restrito a `/admin`, assinado com HMAC e válido por 14 dias; trocar a senha encerra todas as sessões. Tentativas erradas: atraso de 1,2 s e bloqueio de 15 min após 5 falhas (por instância do servidor; a força da senha é a defesa principal). Toda página e ação do painel confere a sessão (`requireTech`/`guardAction`).
+O painel lista: pedidos de horário (Confirmar/Recusar), avaliações de conserto (enviar link de agendamento, chamar no WhatsApp, resolver por conversa) e próximos atendimentos (cancelar). Cada ação devolve a mensagem pronta para o WhatsApp do cliente. A lista atualiza sozinha a cada 30 s.
+
 ## Estado atual (nov/2026)
-Ligado ao banco real: `/agendamento` (instalação com calendário, reserva de 10 min, pedido aguardando técnico; conserto com avaliação ou retirada) e `/agendamento/convite/[token]` (convite individual, uso único, 48 h). Sem `DATABASE_URL` o site cai para o modo demonstrativo, identificado na tela. `/api/agenda/status` confirma a configuração.
-Verificado de ponta a ponta contra um Postgres local (dois clientes disputando o mesmo horário, expiração, convite usado/inventado/malformado, consentimento, mensagem do WhatsApp). Os horários são buscados no servidor ao chegar ao calendário (a página em si é estática).
+Ligado ao banco real: `/agendamento` (instalação com calendário, reserva de 10 min, pedido aguardando técnico; conserto com avaliação ou retirada), `/agendamento/convite/[token]` (convite individual, uso único, 48 h) e o painel do técnico. Sem `DATABASE_URL` o site cai para o modo demonstrativo; `/api/agenda/status` confirma a configuração.
+Verificado de ponta a ponta contra um Postgres local: disputa entre dois clientes pelo mesmo horário, expiração, convite usado/inventado/malformado, consentimento, login, cookie falso, ação sem sessão (negada e sem alterar o pedido), confirmar/recusar/cancelar, acessibilidade.
 
 ## Próximas etapas
-1. **Painel do técnico com login:** listar pedidos, Confirmar/Recusar (`technician_decide`), gerar convite (`createInvite`) e abrir o WhatsApp do cliente com a resposta pronta. Hoje ainda não existe: sem ele, ninguém confirma os pedidos. `/agendamento/prototipo/tecnico` é só uma maquete.
-2. Antirrobô e limite de pedidos pendentes por telefone; aviso ao técnico de pedido novo e de convite sem resposta.
+1. Aviso ao técnico quando chega pedido novo (hoje ele vê ao abrir o painel; a lista se atualiza a cada 30 s). Opções: notificação no celular (PWA) ou e-mail.
+2. Antirrobô e limite de pedidos pendentes por telefone.
 3. Deslocamento por distância (hoje fixo em 30 min).
+4. Páginas `/sobre`, `/contato`, `/privacidade` (o aceite já aponta para a privacidade).

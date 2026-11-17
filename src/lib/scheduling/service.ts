@@ -119,3 +119,57 @@ export async function getBookingStart(id: string): Promise<string | null> {
     return null;
   }
 }
+
+// ------------------------------------------------------------------ painel do técnico (dados com identificação)
+export interface TechBooking {
+  id: string; protocol: string; serviceSlug: string; kind: string; status: string;
+  startIso: string | null; expiresIso: string | null; createdIso: string;
+  name: string; phone: string; neighborhood: string; city: string;
+  tvSize?: string; brand?: string; symptoms: string[]; notes?: string;
+  inviteActiveIso: string | null; hadInvite: boolean;
+}
+const iso = (v: unknown) => (v ? new Date(v as string).toISOString() : null);
+const toTech = (r: postgres.Row): TechBooking => ({
+  id: r.id, protocol: r.protocol, serviceSlug: r.service_slug, kind: r.kind, status: r.status,
+  startIso: iso(r.start_at), expiresIso: iso(r.expires_at), createdIso: iso(r.created_at)!,
+  name: r.customer_name ?? "", phone: r.customer_phone ?? "",
+  neighborhood: r.location?.neighborhood ?? "", city: r.location?.city ?? "",
+  tvSize: r.details?.tvSize, brand: r.details?.brand, symptoms: r.details?.symptoms ?? [], notes: r.details?.notes,
+  inviteActiveIso: iso(r.invite_active), hadInvite: Boolean(r.had_invite),
+});
+const COLS = "b.id, b.protocol, b.service_slug, b.kind, b.status, b.start_at, b.expires_at, b.created_at, b.customer_name, b.customer_phone, b.location, b.details";
+
+export async function listForTechnician() {
+  const q = sql();
+  await q`select mk_agendamento.expire_stale(now())`;
+  const [pending, evaluations, upcoming] = await Promise.all([
+    q.unsafe(`select ${COLS}, null::timestamptz as invite_active, false as had_invite from mk_agendamento.bookings b
+              where b.status = 'aguardando_confirmacao' and b.expires_at > now() order by b.start_at`),
+    q.unsafe(`select ${COLS},
+                (select max(i.expires_at) from mk_agendamento.invites i where i.request_id = b.id and i.used_at is null and i.expires_at > now()) as invite_active,
+                exists(select 1 from mk_agendamento.invites i where i.request_id = b.id) as had_invite
+              from mk_agendamento.bookings b where b.kind = 'avaliacao' and b.status = 'aguardando_tecnico' order by b.created_at`),
+    q.unsafe(`select ${COLS}, null::timestamptz as invite_active, false as had_invite from mk_agendamento.bookings b
+              where b.status in ('confirmado', 'em_atendimento') and b.end_at > now() order by b.start_at limit 50`),
+  ]);
+  return { pending: pending.map(toTech), evaluations: evaluations.map(toTech), upcoming: upcoming.map(toTech) };
+}
+
+export async function getTechBooking(id: string): Promise<TechBooking | null> {
+  const r = await sql().unsafe(`select ${COLS}, null::timestamptz as invite_active, false as had_invite from mk_agendamento.bookings b where b.id = $1::uuid`, [id]);
+  return r[0] ? toTech(r[0]) : null;
+}
+
+/** Cancela um atendimento (libera o horário na hora). */
+export async function cancelBooking(id: string): Promise<boolean> {
+  const r = await sql()`update mk_agendamento.bookings set status = 'cancelado', expires_at = null, updated_at = now()
+                         where id = ${id}::uuid and status in ('confirmado', 'aguardando_confirmacao') returning id`;
+  return r.length === 1;
+}
+
+/** Avaliação resolvida por conversa, sem retirada. */
+export async function closeEvaluation(id: string): Promise<boolean> {
+  const r = await sql()`update mk_agendamento.bookings set status = 'concluido', updated_at = now()
+                         where id = ${id}::uuid and kind = 'avaliacao' and status = 'aguardando_tecnico' returning id`;
+  return r.length === 1;
+}

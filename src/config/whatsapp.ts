@@ -32,3 +32,10 @@ export function buildWhatsAppUrl(message: string, number = businessConfig.whatsa
   if (!number || !/^\d{12,13}$/.test(number)) return null;
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
+
+/** Link para conversar com um CLIENTE (telefone de 10 ou 11 dígitos, DDD + número). Null se o número for inválido. */
+export function buildWhatsAppUrlTo(phoneDigits: string, message: string): string | null {
+  const d = String(phoneDigits ?? "").replace(/\D/g, "");
+  if (!/^\d{10,11}$/.test(d)) return null;
+  return `https://wa.me/55${d}?text=${encodeURIComponent(message)}`;
+}
