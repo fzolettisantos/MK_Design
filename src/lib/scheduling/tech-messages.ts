@@ -12,8 +12,13 @@ export const confirmMessage = (b: TechBooking, service: string) =>
 export const refuseMessage = (b: TechBooking) =>
   `Olá, ${first(b)}! Infelizmente não consigo atender ${when(b)}. Posso sugerir outro horário? Responda com o que for melhor para você. (Protocolo ${b.protocol})`;
 
-export const cancelMessage = (b: TechBooking, service: string) =>
-  `Olá, ${first(b)}! Preciso cancelar o atendimento de ${service} marcado para ${when(b)}. Posso sugerir outro horário? (Protocolo ${b.protocol})`;
+/** Cancelamento: com `token`, leva o link para o cliente escolher outro dia e horário. */
+export const cancelMessage = (b: TechBooking, service: string, token?: string) =>
+  `Olá, ${first(b)}! Preciso cancelar o atendimento de ${service} marcado para ${when(b)}. Peço desculpas pelo imprevisto. ` +
+  (token
+    ? `Escolha outro dia e horário por este link: ${absoluteUrl(`/agendamento/convite/${token}`)} (link individual, válido por 48 horas). `
+    : "Posso sugerir outro horário? ") +
+  `(Protocolo ${b.protocol})`;
 
 export const inviteMessage = (b: TechBooking, token: string) =>
   `Olá, ${first(b)}! Analisei o que você enviou e preciso retirar a TV para avaliar melhor. Escolha o melhor dia e horário por este link: ${absoluteUrl(`/agendamento/convite/${token}`)} (link individual, válido por 48 horas). (Protocolo ${b.protocol})`;

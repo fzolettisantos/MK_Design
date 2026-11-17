@@ -12,6 +12,10 @@
 Em `supabase/migrations/0001_agendamento.sql`, no banco: restrição de exclusão (`no_overlap`) impede dois atendimentos sobrepostos mesmo com cliques simultâneos; antecedência/janela/grade validadas nas funções; expiração materializada por `expire_stale`; RLS ligado **sem políticas** e permissões revogadas de `public/anon/authenticated/service_role` no schema: nenhuma API do Supabase alcança os dados, só o servidor pela conexão direta.
 Testes (`tests/scheduling-db.test.ts`, `tests/availability.test.ts`) rodam a migração real num Postgres (PGlite) com relógio controlado e conferem que o motor de horários livres concorda com o banco.
 
+## Migrações (rodar nesta ordem no SQL Editor; ambas são seguras de repetir)
+1. `0001_agendamento.sql` — tabelas, regras e funções.
+2. `0002_convite_reagendamento.sql` — convite também para **reagendar depois de cancelar** (o cancelamento envia ao cliente um link individual de 48 h para escolher outro dia e hora).
+
 ## Como configurar (uma vez)
 O agendamento vive no schema próprio `mk_agendamento` e é acessado por conexão direta ao Postgres (`DATABASE_URL`). Por isso:
 - serve para **qualquer Postgres**: um projeto Supabase que você já tenha (sem criar outro), Neon (plano gratuito) etc.;
@@ -32,7 +36,7 @@ O motor está isolado do visual: `supabase/migrations`, `src/lib/booking/availab
 
 ## Painel do técnico (senha única)
 `/admin` (login em `/admin/entrar`). Configuração: variável **`TECH_PASSWORD`** na Vercel (mínimo de 14 caracteres; sem ela o acesso fica desativado). Sessão: cookie `httpOnly`, `sameSite=lax`, restrito a `/admin`, assinado com HMAC e válido por 14 dias; trocar a senha encerra todas as sessões. Tentativas erradas: atraso de 1,2 s e bloqueio de 15 min após 5 falhas (por instância do servidor; a força da senha é a defesa principal). Toda página e ação do painel confere a sessão (`requireTech`/`guardAction`).
-O painel lista: pedidos de horário (Confirmar/Recusar), avaliações de conserto (enviar link de agendamento, chamar no WhatsApp, resolver por conversa) e próximos atendimentos (cancelar). Cada ação devolve a mensagem pronta para o WhatsApp do cliente. A lista atualiza sozinha a cada 30 s.
+O painel tem 3 abas: **Aguardando sua resposta** (Confirmar/Recusar), **Avaliações de conserto** (enviar link de agendamento, chamar no WhatsApp, resolver por conversa) e **Próximos atendimentos** (cancelar). Depois de cada ação o cartão muda de cor, com ícone e texto: verde = confirmado, vermelho = recusado, amarelo = cancelado. A mensagem pronta para o WhatsApp do cliente fica dentro do cartão até o técnico marcar "Pronto, já avisei"; a de cancelamento leva o link de reagendamento. A lista atualiza sozinha a cada 30 s.
 
 ## Estado atual (nov/2026)
 Ligado ao banco real: `/agendamento` (instalação com calendário, reserva de 10 min, pedido aguardando técnico; conserto com avaliação ou retirada), `/agendamento/convite/[token]` (convite individual, uso único, 48 h) e o painel do técnico. Sem `DATABASE_URL` o site cai para o modo demonstrativo; `/api/agenda/status` confirma a configuração.

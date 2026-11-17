@@ -81,7 +81,10 @@ export async function cancelAction(input: { id: string }): Promise<Notice | Fail
     const b = await db.getTechBooking(parsed.data);
     if (!b) return fail("nao_encontrado");
     if (!(await db.cancelBooking(parsed.data))) return fail("status_invalido");
-    return notice(b, `Cancelado: avise ${b.name}`, cancelMessage(b, await serviceName(b.serviceSlug)));
+    const svc = await serviceName(b.serviceSlug);
+    // Convite para o cliente escolher outro dia/hora. Se falhar, o cancelamento vale e a mensagem segue sem o link.
+    const inv = await db.createInvite(parsed.data).catch(() => null);
+    return notice(b, `Cancelado: avise ${b.name}`, cancelMessage(b, svc, inv?.ok ? inv.token : undefined));
   } catch {
     return fail("indisponivel");
   }

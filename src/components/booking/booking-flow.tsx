@@ -19,7 +19,7 @@ import type { Service, ServiceCategory } from "@/types";
 type Mode = "agenda" | "avaliacao" | "retirada";
 type Step = "servico" | "modo" | "local" | "horario" | "dados" | "pronto";
 type Done = { protocol: string; message: string; whatsappUrl: string | null; startIso: string | null; demo: boolean };
-export interface InviteInfo { token: string; firstName: string; serviceSlug: string; neighborhood: string; city: string }
+export interface InviteInfo { token: string; firstName: string; serviceSlug: string; kind: string; neighborhood: string; city: string }
 
 const HOLD_SECONDS = 10 * 60;
 const PERIODS = [
@@ -51,7 +51,7 @@ export function BookingFlow({
   const inviteService = invite ? services.find((s) => s.slug === invite.serviceSlug) ?? null : null;
   const [step, setStep] = React.useState<Step>(invite ? "horario" : "servico");
   const [service, setService] = React.useState<Service | null>(inviteService);
-  const [mode, setMode] = React.useState<Mode>(invite ? "retirada" : "agenda");
+  const [mode, setMode] = React.useState<Mode>(invite ? (inviteService?.categoryId === "assistencia-tecnica" ? "retirada" : "agenda") : "agenda");
   const [place, setPlace] = React.useState({ cep: "", bairro: invite?.neighborhood ?? "", cidade: invite?.city ?? "" });
   const [days, setDays] = React.useState<DayAvailability[]>(initialDays ?? []);
   const [loadingDays, setLoadingDays] = React.useState(false);
@@ -194,8 +194,10 @@ export function BookingFlow({
         </Alert>
       )}
       {invite && (
-        <Alert title="Convite do técnico: retirada da TV">
-          O técnico pediu para retirar sua TV. Escolha o dia e a hora que ficam melhores para você. Seu endereço e seus dados já estão no pedido.
+        <Alert title={invite.kind === "avaliacao" ? "Convite do técnico: retirada da TV" : "Convite do técnico: escolha um novo horário"}>
+          {invite.kind === "avaliacao"
+            ? "O técnico pediu para retirar sua TV. Escolha o dia e a hora que ficam melhores para você. Seu endereço e seus dados já estão no pedido."
+            : "Precisamos remarcar o seu atendimento. Escolha o novo dia e hora que ficam melhores para você. Seu endereço e seus dados já estão no pedido."}
         </Alert>
       )}
 
@@ -420,7 +422,7 @@ function Result({ done, mode, headRef }: { done: Done; mode: Mode; headRef: Reac
       ) : (
         <Alert variant="error" title="WhatsApp ainda não configurado">Copie a mensagem abaixo e envie ao técnico.</Alert>
       )}
-      <pre className="whitespace-pre-wrap rounded-card border border-border bg-surface p-4 text-sm">{done.message}</pre>
+      <pre className="whitespace-pre-wrap break-words rounded-card border border-border bg-surface p-4 text-sm [overflow-wrap:anywhere]">{done.message}</pre>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" onClick={copy}>Copiar mensagem</Button>
         <p role="status" className="text-sm font-semibold">{copied ? "Mensagem copiada." : ""}</p>

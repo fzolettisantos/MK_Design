@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { beforeEach, describe, expect, it } from "vitest";
 
 /** Roda a migração REAL num Postgres (PGlite) e testa as garantias do banco com relógio controlado. */
-const SQL = readFileSync("supabase/migrations/0001_agendamento.sql", "utf8");
+const SQL = readFileSync("supabase/migrations/0001_agendamento.sql", "utf8") + "\n" + readFileSync("supabase/migrations/0002_convite_reagendamento.sql", "utf8");
 const NOW = "2026-11-17T12:00:00-03:00"; // terça, 12:00 em Brasília
 const at = (iso: string) => new Date(iso).toISOString();
 // Horários válidos (grade de 1h, >24h de antecedência, <30 dias): dia 19/11 em Brasília.
@@ -188,6 +188,40 @@ describe("convite do técnico (conserto com retirada)", () => {
     const r = await call("get_invite", "hash1", at(NOW));
     expect(JSON.stringify(r)).not.toContain("13912345678");
     expect((r as { first_name?: string }).first_name).toBe("Maria");
+  });
+});
+
+describe("convite de reagendamento (depois de cancelar)", () => {
+  async function cancelled() {
+    const h = await hold(T(14), "a");
+    await call("finalize_hold", h.id!, "a", person, at(NOW));
+    await call("technician_decide", h.id!, "confirmar", at(NOW));
+    await db.query(`update bookings set status = 'cancelado' where id = $1`, [h.id]);
+    return h.id!;
+  }
+  it("atendimento cancelado pode receber convite; o horário antigo fica livre", async () => {
+    const id = await cancelled();
+    expect((await call("create_invite", id, "re1", at(NOW))).ok).toBe(true);
+    expect((await hold(T(14), "outro")).ok).toBe(true); // cancelar liberou o horário
+  });
+  it("cliente escolhe outro horário: novo atendimento do MESMO tipo, o antigo continua cancelado", async () => {
+    const id = await cancelled();
+    await call("create_invite", id, "re1", at(NOW));
+    expect((await call("get_invite", "re1", at(NOW)) as { kind?: string }).kind).toBe("instalacao");
+    const r = await call("claim_invite_slot", "re1", T(18, 22), at("2026-11-17T13:00:00-03:00"));
+    expect(r.ok).toBe(true);
+    const rows = await db.query<{ id: string; kind: string; status: string; parent_id: string | null }>(`select id, kind, status, parent_id from bookings order by created_at, id`);
+    const novo = rows.rows.find((x) => x.id === r.id)!;
+    expect(novo).toMatchObject({ kind: "instalacao", status: "aguardando_confirmacao", parent_id: id });
+    expect(rows.rows.find((x) => x.id === id)!.status).toBe("cancelado");
+    expect((await call("claim_invite_slot", "re1", T(20, 22), at("2026-11-17T13:01:00-03:00"))).reason).toBe("convite_usado");
+  });
+  it("só atendimentos cancelados ou avaliações pendentes aceitam convite", async () => {
+    const h = await hold(T(14), "a");
+    await call("finalize_hold", h.id!, "a", person, at(NOW));
+    expect((await call("create_invite", h.id!, "x", at(NOW))).reason).toBe("pedido_invalido"); // ainda aguardando confirmação
+    await call("technician_decide", h.id!, "confirmar", at(NOW));
+    expect((await call("create_invite", h.id!, "x", at(NOW))).reason).toBe("pedido_invalido"); // confirmado
   });
 });
 

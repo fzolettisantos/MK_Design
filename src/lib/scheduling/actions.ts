@@ -97,11 +97,16 @@ export async function claimInviteAction(input: { token: string; start: string })
   return safe(async () => {
     const r = await db.claimInviteSlot(String(input.token), start);
     if (!r.ok) return { ok: false as const, reason: String(r.reason ?? "erro") };
-    const startIso = await db.getBookingStart(String(r.id));
+    const b = await db.getTechBooking(String(r.id));
+    const startIso = b?.startIso ?? null;
     const when = startIso ? fmtSlotParts(startIso) : null;
+    const svc = b ? ((await serviceRepository.list()).find((s) => s.slug === b.serviceSlug)?.name ?? "Serviço") : "Serviço";
     const message = buildWhatsAppMessage({
-      protocolo: String(r.protocol), servico: "Retirada da TV para conserto (convite do técnico)", detalhes: "Horário escolhido pelo link enviado pelo técnico",
-      localidade: "(já no pedido)", data: when?.date ?? "", hora: when?.time ?? "", nome: "(já no pedido)",
+      protocolo: String(r.protocol),
+      servico: `${svc}${b?.kind === "retirada" ? " (retirada da TV para conserto)" : ""}`,
+      detalhes: "Horário escolhido pelo link enviado pelo técnico",
+      localidade: b ? `${b.neighborhood}/${b.city}` : "—",
+      data: when?.date ?? "", hora: when?.time ?? "", nome: b?.name ?? "—",
     });
     return { ok: true as const, protocol: String(r.protocol), startIso, message, whatsappUrl: buildWhatsAppUrl(message) };
   });

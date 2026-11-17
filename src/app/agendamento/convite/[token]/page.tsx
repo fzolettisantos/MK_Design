@@ -33,7 +33,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   }
   return (
     <>
-      <PageHero id="convite-title" eyebrow="CONVITE DO TÉCNICO" title="Retirada da TV" />
+      <PageHero id="convite-title" eyebrow="CONVITE DO TÉCNICO" title="Escolha o horário" />
       <PageBody>
         <div className="container-mk min-h-[40rem] max-w-3xl ml-0 md:mx-auto">
           {inv?.ok ? (
@@ -46,6 +46,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
                 token,
                 firstName: String(inv.first_name ?? ""),
                 serviceSlug: String(inv.service_slug),
+                kind: String(inv.kind ?? "avaliacao"),
                 neighborhood: String((inv.location as { neighborhood?: string } | null)?.neighborhood ?? ""),
                 city: String((inv.location as { city?: string } | null)?.city ?? ""),
               }}
