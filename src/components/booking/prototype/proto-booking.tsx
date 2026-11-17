@@ -20,18 +20,20 @@ const nowMs = () => Date.now();
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const fmtTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-export function ProtoBooking({ services, categories, nowIso }: { services: Service[]; categories: ServiceCategory[]; nowIso: string }) {
-  const [step, setStep] = React.useState<Step>("servico");
-  const [service, setService] = React.useState<Service | null>(null);
-  const [mode, setMode] = React.useState<Mode>("agenda");
-  const [place, setPlace] = React.useState({ cep: "", bairro: "", cidade: "" });
+export function ProtoBooking({ services, categories, nowIso, invite = false }: { services: Service[]; categories: ServiceCategory[]; nowIso: string; invite?: boolean }) {
+  // Convite do técnico: serviço (retirada), endereço e contato já vêm do pedido; o cliente só escolhe o horário.
+  const [step, setStep] = React.useState<Step>(invite ? "horario" : "servico");
+  const [service, setService] = React.useState<Service | null>(invite ? (services.find((s) => s.slug === "solicitar-conserto-de-tv") ?? null) : null);
+  const [mode, setMode] = React.useState<Mode>(invite ? "retirada" : "agenda");
+  const [place, setPlace] = React.useState(invite ? { cep: "", bairro: "Bairro Exemplo", cidade: "Cidade Exemplo" } : { cep: "", bairro: "", cidade: "" });
+  const [diag, setDiag] = React.useState<{ brand: string; symptoms: string[] }>({ brand: "", symptoms: [] });
   const [days] = React.useState<Day[]>(() => buildDays(new Date(nowIso)));
   const deadline = React.useRef(0);
   const [dayKey, setDayKey] = React.useState<string | null>(null);
   const [slot, setSlot] = React.useState<{ key: string; hour: number } | null>(null);
   const [left, setLeft] = React.useState(HOLD_SECONDS);
   const [expired, setExpired] = React.useState(false);
-  const [contact, setContact] = React.useState({ name: "", phone: "", notes: "" });
+  const [contact, setContact] = React.useState(invite ? { name: "Cliente Exemplo", phone: "(13) 00000-0000", notes: "" } : { name: "", phone: "", notes: "" });
   const [error, setError] = React.useState<string | null>(null);
   const headRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -86,6 +88,7 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
 
   const submitContact = () => {
     if (contact.name.trim().length < 2) return setError("Informe seu nome.");
+    if (mode === "avaliacao" && (!diag.brand || diag.symptoms.length === 0)) return setError("Escolha a marca e marque ao menos um problema.");
     if (!/^\d{10,11}$/.test(contact.phone.replace(/\D/g, ""))) return setError("Informe DDD e número, ex.: (13) 91234-5678.");
     setError(null);
     setStep("pronto");
@@ -96,7 +99,7 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
   const message = buildWhatsAppMessage({
     protocolo: "MK-PROTOTIPO",
     servico: `${service?.name ?? ""}${mode === "retirada" ? " (retirada da TV para conserto, sem diagnóstico prévio)" : ""}`,
-    detalhes: contact.notes || "—",
+    detalhes: mode === "avaliacao" ? [`marca ${diag.brand}`, `problema: ${diag.symptoms.join(", ")}`, contact.notes && `obs.: ${contact.notes}`].filter(Boolean).join("; ") : mode === "retirada" && invite ? "Retirada agendada pelo link enviado pelo técnico" : contact.notes || "—",
     localidade: `${place.bairro}/${place.cidade}`,
     data: when ? format(when.date, "dd/MM/yyyy") : "A combinar (sem agenda)",
     hora: slot ? hourLabel(slot.hour) : "A combinar",
@@ -110,6 +113,12 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
         Os horários ocupados e o deslocamento são <strong>exemplos</strong>. Nada é gravado nem enviado. Serve para
         validar o fluxo antes de ligar o banco de dados.
       </Alert>
+
+      {invite && (
+        <Alert title="Convite do técnico: retirada da TV">
+          O técnico pediu para retirar sua TV. Escolha abaixo o dia e a hora que ficam melhores para você. Seu endereço e seus dados já estão no pedido.
+        </Alert>
+      )}
 
       <div className="flex flex-col gap-6">
         <h2 ref={headRef} tabIndex={-1} className="text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] outline-none">
@@ -155,7 +164,7 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
             <fieldset className="grid gap-3">
               <legend className="sr-only">Como seguir</legend>
               <SelectableCard type="radio" name="modo" checked={mode === "avaliacao"} onChange={() => setMode("avaliacao")}
-                title="Quero uma avaliação primeiro" description="Sem agendar agora. Você descreve o problema e conversa com o técnico pelo WhatsApp." />
+                title="Quero uma avaliação primeiro" description="Sem agendar agora. Você descreve o problema e envia ao técnico pelo WhatsApp. Se ele precisar retirar a TV, te envia um link para você escolher o horário." />
               <SelectableCard type="radio" name="modo" checked={mode === "retirada"} onChange={() => setMode("retirada")}
                 title="Quero que o técnico retire a TV para o conserto" description="Escolha o dia e a hora para a retirada, mesmo sem diagnóstico." />
             </fieldset>
@@ -271,7 +280,7 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
                   <CalendarCheck className="size-5 shrink-0 text-brand-primary" aria-hidden="true" />
                   <span><strong>{whenText}</strong> · {SLOT_MINUTES} min</span>
                 </p>
-                <Button type="button" onClick={() => setStep("dados")}>
+                <Button type="button" onClick={() => setStep(invite ? "pronto" : "dados")}>
                   Reservar este horário <ArrowRight aria-hidden="true" />
                 </Button>
               </div>
@@ -288,11 +297,32 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
               </div>
             )}
             {mode === "avaliacao" && (
-              <Alert>Sem horário reservado: o técnico avalia o problema pelo WhatsApp e combina os próximos passos.</Alert>
+              <Alert>Sem horário reservado. O técnico analisa o que você descrever e responde pelo WhatsApp. Se for preciso retirar a TV, ele envia um link para você escolher o horário.</Alert>
             )}
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Nome" required>{(a) => <Input {...a} autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />}</Field>
               <Field label="WhatsApp" required hint="Com DDD.">{(a) => <Input {...a} type="tel" inputMode="tel" autoComplete="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />}</Field>
+              {mode === "avaliacao" && (
+                <>
+                  <Field label="Marca da TV" required>
+                    {(a) => (
+                      <select {...a} value={diag.brand} onChange={(e) => setDiag({ ...diag, brand: e.target.value })} className="h-12 w-full rounded-input border border-neutral-mid bg-surface px-4">
+                        <option value="">Selecione</option>
+                        {["Samsung", "Sony", "TCL", "LG", "Philips", "Outra marca"].map((b) => <option key={b}>{b}</option>)}
+                      </select>
+                    )}
+                  </Field>
+                  <fieldset className="sm:col-span-2">
+                    <legend className="mb-2 text-sm font-semibold">O que está acontecendo? <span aria-hidden="true">*</span></legend>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {["Não liga", "Sem imagem", "Sem som", "Imagem com falhas", "Entradas/conexões", "Outro"].map((sy) => (
+                        <SelectableCard key={sy} type="checkbox" title={sy} checked={diag.symptoms.includes(sy)}
+                          onChange={(e) => setDiag({ ...diag, symptoms: e.target.checked ? [...diag.symptoms, sy] : diag.symptoms.filter((x) => x !== sy) })} />
+                      ))}
+                    </div>
+                  </fieldset>
+                </>
+              )}
               <Field label="Detalhes (opcional)" className="sm:col-span-2" hint="Tamanho da TV, tipo de parede, o que está acontecendo…">
                 {(a) => <Input {...a} value={contact.notes} onChange={(e) => setContact({ ...contact, notes: e.target.value })} />}
               </Field>
@@ -311,7 +341,9 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
                 </span>
               </Alert>
             ) : (
-              <Alert title="Falta enviar a mensagem">Nenhum horário foi reservado. Envie a mensagem para conversar com o técnico.</Alert>
+              <Alert title="Falta enviar a mensagem">
+                Nenhum horário foi reservado. Envie a mensagem com o diagnóstico: o técnico avalia e, se precisar retirar a TV, te envia um link para você escolher o horário.
+              </Alert>
             )}
             <p className="font-semibold">Último passo: toque em enviar no WhatsApp.</p>
             {waUrl ? (
@@ -334,7 +366,7 @@ export function ProtoBooking({ services, categories, nowIso }: { services: Servi
 
         {error && <Alert variant="error">{error}</Alert>}
 
-        {step !== "servico" && step !== "pronto" && (
+        {step !== "servico" && step !== "pronto" && !(invite && step === "horario") && (
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
             <Button type="button" variant="outline" onClick={() => { setError(null); const b = goBack[step]; if (b) setStep(b); }}>
               <ArrowLeft aria-hidden="true" /> Voltar
